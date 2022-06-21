@@ -1,10 +1,10 @@
-package org.processmining.newpackageivy.algorithms;
+package org.processmining.cachealignment.algorithms;
 
+import org.processmining.cachealignment.models.YourFirstInput;
+import org.processmining.cachealignment.models.YourOutput;
+import org.processmining.cachealignment.models.YourSecondInput;
+import org.processmining.cachealignment.parameters.YourParameters;
 import org.processmining.framework.plugin.PluginContext;
-import org.processmining.newpackageivy.models.YourFirstInput;
-import org.processmining.newpackageivy.models.YourOutput;
-import org.processmining.newpackageivy.models.YourSecondInput;
-import org.processmining.newpackageivy.parameters.YourParameters;
 
 public class YourAlgorithm {
 

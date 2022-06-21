@@ -1,4 +1,4 @@
-package org.processmining.newpackageivy.help;
+package org.processmining.cachealignment.help;
 
 public class YourHelp {
 
