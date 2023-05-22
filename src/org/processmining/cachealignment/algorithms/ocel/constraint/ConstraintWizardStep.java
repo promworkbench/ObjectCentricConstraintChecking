@@ -1,24 +1,22 @@
-package org.processmining.cachealignment.algorithms.ocel.extraction;
+package org.processmining.cachealignment.algorithms.ocel.constraint;
 
 
+import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
+import org.processmining.framework.util.ui.widgets.ProMComboBox;
+import org.processmining.framework.util.ui.widgets.ProMPropertiesPanel;
+import org.processmining.framework.util.ui.wizard.ProMWizardStep;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.swing.*;
-
-import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
-import org.processmining.framework.util.ui.widgets.ProMComboBox;
-import org.processmining.framework.util.ui.widgets.ProMPropertiesPanel;
-import org.processmining.framework.util.ui.wizard.ProMWizardStep;
-import org.processmining.cachealignment.algorithms.ocel.extraction.PEModel;
-
-public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWizardStep<ExtractionWizardParameters> {
+public class ConstraintWizardStep extends ProMPropertiesPanel implements ProMWizardStep<ConstraintWizardParameters> {
     OcelEventLog ocelLog;
 
-    PEModel cm = PEModel.getInstance();
+    ConstraintModel cm = ConstraintModel.getInstance();
 
     private static final String TITLE = "Extract Case";
 
@@ -26,7 +24,7 @@ public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWiz
 
     private HashSet<String> revObjSet = new HashSet<>();
 
-    public ExtractionWizardStep(OcelEventLog ocelLog) {
+    public ConstraintWizardStep(OcelEventLog ocelLog) {
         super(TITLE);
         this.ocelLog = ocelLog;
         List<String> objectTypes = new ArrayList<String>(this.ocelLog.objectTypes.keySet());
@@ -53,10 +51,10 @@ public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWiz
         addProperty("Secondary object type(s)",jp2);
     }
 
-    public ExtractionWizardParameters apply(ExtractionWizardParameters model, JComponent component) {
+    public ConstraintWizardParameters apply(ConstraintWizardParameters model, JComponent component) {
         // TODO Auto-generated method stub
         if (canApply(model, component)) {
-            ExtractionWizardStep step = (ExtractionWizardStep) component;
+            ConstraintWizardStep step = (ConstraintWizardStep) component;
             model.setLeadObjectType((String)objectTypeList.getSelectedItem());
             revObjSet.remove((String)objectTypeList.getSelectedItem());
             model.setRevObjectType(revObjSet);
@@ -64,12 +62,12 @@ public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWiz
         return model;
     }
 
-    public boolean canApply(ExtractionWizardParameters model, JComponent component) {
+    public boolean canApply(ConstraintWizardParameters model, JComponent component) {
         // TODO Auto-generated method stub
-        return component instanceof ExtractionWizardStep;
+        return component instanceof ConstraintWizardStep;
     }
 
-    public JComponent getComponent(ExtractionWizardParameters model) {
+    public JComponent getComponent(ConstraintWizardParameters model) {
         // TODO Auto-generated method stub
         return this;
     }

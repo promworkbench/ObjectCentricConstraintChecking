@@ -4,7 +4,7 @@ import org.processmining.cachealignment.algorithms.analysis.*;
 import org.processmining.cachealignment.algorithms.costfunction.mxCostFunction;
 import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
 import org.processmining.cachealignment.algorithms.ocel.extraction.CaseGraph;
-import org.processmining.cachealignment.algorithms.ocel.extraction.PEGraph;
+import org.processmining.cachealignment.algorithms.ocel.extraction.ProcessExecutionPanel;
 import org.processmining.cachealignment.algorithms.swing.mxGraphComponent;
 import org.processmining.cachealignment.algorithms.swing.util.mxGraphActions;
 import org.processmining.cachealignment.algorithms.util.mxConstants;
@@ -13,7 +13,6 @@ import org.processmining.cachealignment.algorithms.util.mxResources;
 import org.processmining.cachealignment.algorithms.view.mxGraph;
 import org.processmining.cachealignment.algorithms.view.mxGraphView;
 import org.processmining.cachealignment.algorithms.ocel.constraint.OCCMEditor;
-import org.processmining.cachealignment.algorithms.analysis.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -541,11 +540,12 @@ public class EditorMenuBar extends JMenuBar
 
 	}
 
+
 	/**
 	 * Adds menu items to the given shape menu. This is factored out because
 	 * the shape menu appears in the menubar and also in the popupmenu.
 	 */
-	public static void populateShapeMenu(JMenu menu, OCCMEditor editor)
+	public static void populateShapeMenu(JMenu menu, ProcessExecutionPanel editor)
 	{
 		menu.add(editor.bind(mxResources.get("home"), mxGraphActions.getHomeAction(), "/com/mxgraph/examples/swing/images/house.gif"));
 
@@ -605,8 +605,11 @@ public class EditorMenuBar extends JMenuBar
 
 	}
 
-
-	public static void populateShapeMenu(JMenu menu, PEGraph editor)
+	/**
+	 * Adds menu items to the given shape menu. This is factored out because
+	 * the shape menu appears in the menubar and also in the popupmenu.
+	 */
+	public static void populateShapeMenu(JMenu menu, OCCMEditor editor)
 	{
 		menu.add(editor.bind(mxResources.get("home"), mxGraphActions.getHomeAction(), "/com/mxgraph/examples/swing/images/house.gif"));
 
@@ -1131,12 +1134,11 @@ public class EditorMenuBar extends JMenuBar
 		menu.add(editor.bind(mxResources.get("style"), new EditorActions.StyleAction()));
 	}
 
-
 	/**
 	 * Adds menu items to the given format menu. This is factored out because
 	 * the format menu appears in the menubar and also in the popupmenu.
 	 */
-	public static void populateFormatMenu(JMenu menu, PEGraph editor)
+	public static void populateFormatMenu(JMenu menu, ProcessExecutionPanel editor)
 	{
 		JMenu submenu = (JMenu) menu.add(new JMenu(mxResources.get("background")));
 
@@ -1333,6 +1335,8 @@ public class EditorMenuBar extends JMenuBar
 
 		menu.add(editor.bind(mxResources.get("style"), new EditorActions.StyleAction()));
 	}
+
+
 
 
 	/**

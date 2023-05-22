@@ -1,17 +1,16 @@
-package org.processmining.cachealignment.algorithms.ocel.extraction;
+package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import org.processmining.cachealignment.algorithms.ocel.extraction.CaseGraph;
+import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintWizardParameters;
+import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintWizardStep;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObjectType;
-import org.processmining.cachealignment.algorithms.ocel.extraction.PEModel;
-
-
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.processmining.framework.util.ui.wizard.ListWizard;
 import org.processmining.framework.util.ui.wizard.ProMWizardDisplay;
 import org.processmining.framework.util.ui.wizard.ProMWizardStep;
-import org.processmining.cachealignment.algorithms.ocel.ocelobjects.*;
 
 import javax.swing.*;
 import java.util.*;
@@ -20,16 +19,16 @@ public class CaseExtraction {
 
     protected JPanel root;
 
-    PEModel cm = PEModel.getInstance();
+    ConstraintModel cm = ConstraintModel.getInstance();
 
     public CaseGraph extractCase(UIPluginContext context,
-                               OcelEventLog ocel) throws InterruptedException {
+                                 OcelEventLog ocel) throws InterruptedException {
 
-        ExtractionWizardStep wizStep = new ExtractionWizardStep(ocel);
-        List<ProMWizardStep<ExtractionWizardParameters>> wizStepList = new ArrayList<>();
+        ConstraintWizardStep wizStep = new ConstraintWizardStep(ocel);
+        List<ProMWizardStep<ConstraintWizardParameters>> wizStepList = new ArrayList<>();
         wizStepList.add(wizStep);
-        ListWizard<ExtractionWizardParameters> listWizard = new ListWizard<>(wizStepList);
-        ExtractionWizardParameters parameters = ProMWizardDisplay.show(context, listWizard, new ExtractionWizardParameters());
+        ListWizard<ConstraintWizardParameters> listWizard = new ListWizard<>(wizStepList);
+        ConstraintWizardParameters parameters = ProMWizardDisplay.show(context, listWizard, new ConstraintWizardParameters());
 
         cm.leadObjType=parameters.leadObjType;
         cm.revObjTypes=parameters.revObjTypes;

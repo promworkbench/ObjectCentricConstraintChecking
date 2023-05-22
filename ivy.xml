@@ -1,5 +1,5 @@
 <ivy-module version="2.0">
-    <info organisation="prom" module="OCCM" revision="latest">
+    <info organisation="prom" module="CacheAlignment" revision="latest">
     	<description>
     		Version VERSION
     	</description>

@@ -1,7 +1,7 @@
 package org.processmining.cachealignment.algorithms.editor;
 
 import org.processmining.cachealignment.algorithms.ocel.extraction.CaseGraph;
-import org.processmining.cachealignment.algorithms.ocel.extraction.PEGraph;
+import org.processmining.cachealignment.algorithms.ocel.extraction.ProcessExecutionPanel;
 import org.processmining.cachealignment.algorithms.swing.util.mxGraphActions;
 import org.processmining.cachealignment.algorithms.util.mxResources;
 import org.processmining.cachealignment.algorithms.ocel.constraint.OCCMEditor;
@@ -142,7 +142,7 @@ public class EditorPopupMenu extends JPopupMenu
 				.getSelectAllAction()));
 	}
 
-	public EditorPopupMenu(PEGraph editor)
+	public EditorPopupMenu(ProcessExecutionPanel editor)
 	{
 		boolean selected = !editor.getGraphComponent().getGraph()
 				.isSelectionEmpty();
@@ -204,6 +204,7 @@ public class EditorPopupMenu extends JPopupMenu
 		add(editor.bind(mxResources.get("selectAll"), mxGraphActions
 				.getSelectAllAction()));
 	}
+
 
 	public EditorPopupMenu(CaseGraph editor)
 	{

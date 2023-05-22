@@ -1,11 +1,5 @@
-package org.processmining.cachealignment.algorithms.ocel.constraint;
+package org.processmining.cachealignment.algorithms.ocel.extraction;
 
-import java.util.*;
-
-import javax.swing.JPanel;
-
-import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintWizardParameters;
-import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintWizardStep;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
@@ -17,17 +11,19 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.util.ui.wizard.ListWizard;
 import org.processmining.framework.util.ui.wizard.ProMWizardDisplay;
 import org.processmining.framework.util.ui.wizard.ProMWizardStep;
-import org.processmining.cachealignment.algorithms.ocel.ocelobjects.*;
 
-@Plugin(name = "OCCL Constraints Monitor",
-returnLabels = { "OCCM Editor" },
-returnTypes = { OCCMEditor.class },
+import javax.swing.*;
+import java.util.*;
+
+@Plugin(name = "Extract Process Execution",
+returnLabels = { "Process Execution Visualizer" },
+returnTypes = { ProcessExecutionPanel.class },
 parameterLabels = { "Object-Centric Event Log" },
 help = "Object-Centric Event Log",
 userAccessible = true)
-public class ConstraintEditor {
+public class PEVisualiztion {
 
-	ConstraintModel cm = ConstraintModel.getInstance();
+	PEModel cm = PEModel.getInstance();
 
 	protected JPanel root;
 
@@ -36,15 +32,15 @@ public class ConstraintEditor {
 			affiliation = "PADS RWTH",
 			author = "Tian",
 			email = "tian.li@rwth-aachen.de")
-	public OCCMEditor getConstraintFromOCEL(UIPluginContext context,
-											OcelEventLog ocel) throws InterruptedException {
+	public ProcessExecutionPanel getConstraintFromOCEL(UIPluginContext context,
+													   OcelEventLog ocel) throws InterruptedException {
 
-		ConstraintWizardStep wizStep = new ConstraintWizardStep(ocel);
-		List<ProMWizardStep<ConstraintWizardParameters>> wizStepList = new ArrayList<>();
+		ExtractionWizardStep wizStep = new ExtractionWizardStep(ocel);
+		List<ProMWizardStep<ExtractionWizardParameters>> wizStepList = new ArrayList<>();
 		wizStepList.add(wizStep);
-		ListWizard<ConstraintWizardParameters> listWizard = new ListWizard<>(wizStepList);
-		ConstraintWizardParameters parameters = ProMWizardDisplay.show(context, listWizard, new ConstraintWizardParameters());
-		ConstraintModel cm = ConstraintModel.getInstance();
+		ListWizard<ExtractionWizardParameters> listWizard = new ListWizard<>(wizStepList);
+		ExtractionWizardParameters parameters = ProMWizardDisplay.show(context, listWizard, new ExtractionWizardParameters());
+		PEModel cm = PEModel.getInstance();
 		ArrayList<String> objTypeList = new ArrayList<>();
 		objTypeList.add(parameters.leadObjType);
 		for(String revObjType: parameters.revObjTypes){
@@ -62,16 +58,16 @@ public class ConstraintEditor {
 
 		cm.setOCEL(ocel);
 		cm.setObjTypeList(objTypeList);
-		OCCMEditor ge = new OCCMEditor(
+		ProcessExecutionPanel pev = new ProcessExecutionPanel(
 				context,
 				lstMap.get(0),
 				lstMap.get(3),
 				ocel,
 				objTypeList,
 				actList);
-		return ge;
+		return pev;
 	}
-	
+
 	public Set<String> getActivityList(OcelEventLog ocel) {
 		Set<String> activityLst =  new HashSet<>();
 		for (OcelEvent evt : ocel.events.values()) {
@@ -350,4 +346,3 @@ public class ConstraintEditor {
 
 
 }
- 

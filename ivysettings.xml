@@ -1,4 +1,5 @@
 <ivysettings>
+<caches  defaultCacheDir="C:\\Users\\59815\\.ivy2\\cache"/>
     <settings defaultResolver="default" />   
     <resolvers>
         <url name="prom" checkmodified="true">
