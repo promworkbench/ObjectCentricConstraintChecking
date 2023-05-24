@@ -891,7 +891,7 @@ public class OCCMEditor extends JPanel
 
 				ProgressMonitor pm = new ProgressMonitor(null,
 						"Waiting for results","Already done:",
-						0,3);
+						0,cm.consLst.size());
 
 				// get the amount of constraints to check
 				// start the child thread

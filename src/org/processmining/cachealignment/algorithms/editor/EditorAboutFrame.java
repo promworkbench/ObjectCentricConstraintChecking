@@ -1,13 +1,29 @@
 package org.processmining.cachealignment.algorithms.editor;
 
-import org.processmining.cachealignment.algorithms.util.mxResources;
-import org.processmining.cachealignment.algorithms.view.mxGraph;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
+
+import org.processmining.cachealignment.algorithms.util.mxResources;
+import org.processmining.cachealignment.algorithms.view.mxGraph;
 
 public class EditorAboutFrame extends JDialog
 {
@@ -23,7 +39,9 @@ public class EditorAboutFrame extends JDialog
 	public EditorAboutFrame(Frame owner)
 	{
 		super(owner);
-		setTitle(mxResources.get("aboutGraphEditor"));
+		setTitle("");
+
+//		setTitle(mxResources.get("aboutGraphEditor"));
 		setLayout(new BorderLayout());
 
 		// Creates the gradient panel

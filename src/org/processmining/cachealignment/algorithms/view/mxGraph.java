@@ -3,23 +3,47 @@
  */
 package org.processmining.cachealignment.algorithms.view;
 
-import org.processmining.cachealignment.algorithms.model.*;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.processmining.cachealignment.algorithms.canvas.mxGraphics2DCanvas;
 import org.processmining.cachealignment.algorithms.canvas.mxICanvas;
 import org.processmining.cachealignment.algorithms.canvas.mxImageCanvas;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.processmining.cachealignment.algorithms.util.*;
+import org.processmining.cachealignment.algorithms.model.mxCell;
+import org.processmining.cachealignment.algorithms.model.mxGeometry;
+import org.processmining.cachealignment.algorithms.model.mxGraphModel;
+import org.processmining.cachealignment.algorithms.model.mxICell;
+import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
+import org.processmining.cachealignment.algorithms.util.mxConstants;
+import org.processmining.cachealignment.algorithms.util.mxEvent;
+import org.processmining.cachealignment.algorithms.util.mxEventObject;
+import org.processmining.cachealignment.algorithms.util.mxEventSource;
+import org.processmining.cachealignment.algorithms.util.mxImageBundle;
+import org.processmining.cachealignment.algorithms.util.mxPoint;
+import org.processmining.cachealignment.algorithms.util.mxRectangle;
+import org.processmining.cachealignment.algorithms.util.mxResources;
+import org.processmining.cachealignment.algorithms.util.mxStyleUtils;
+import org.processmining.cachealignment.algorithms.util.mxUndoableEdit;
 import org.processmining.cachealignment.algorithms.util.mxUndoableEdit.mxUndoableChange;
-import org.processmining.cachealignment.algorithms.model.*;
+import org.processmining.cachealignment.algorithms.util.mxUtils;
 import org.w3c.dom.Element;
-
-import java.awt.*;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.List;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Implements a graph object that allows to create diagrams from a graph model
@@ -154,7 +178,7 @@ public class mxGraph extends mxEventSource
 	{
 		try
 		{
-			mxResources.add("org.processmining.resources.graph");
+//			mxResources.add("org.processmining.resources.graph");
 		}
 		catch (Exception e)
 		{

@@ -1446,6 +1446,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		vBox.add(hBox4);
 		dialog.getContentPane().add(vBox);
 	}
+	
 	public void getActToObjDialog(Object cell,
 								  mxGraph graph,
 								  String refObjType,
@@ -1619,13 +1620,11 @@ public class mxConnectionHandler extends mxMouseAdapter
 		Box hBoxTimeToTime = Box.createHorizontalBox();
 
 		List<String> names = Arrays.asList(
-				"Waiting time",
-				"Synchronization time",
-				"Lagging time",
-				"Response time",
-				"Throughput time",
-				"Clogging time",
-				"Pooling time");
+				"flow time",
+				"waiting time",
+				"synchronization time",
+				"pooling time",
+				"lagging time");
 		JComboBox<String> jcb = new JComboBox<>();
 
 		for (String name : names) {
@@ -1662,9 +1661,9 @@ public class mxConnectionHandler extends mxMouseAdapter
 		minTimeJtf.setMaximumSize(new Dimension(50,20));
 		minTimeJtf.setMinimumSize(new Dimension(50,20));
 		minTimeJtf.setPreferredSize(new Dimension(50,20));
-		maxTimeJtf.setMaximumSize(new Dimension(120,20));
-		maxTimeJtf.setMinimumSize(new Dimension(120,20));
-		maxTimeJtf.setPreferredSize(new Dimension(120,20));
+		maxTimeJtf.setMaximumSize(new Dimension(80,20));
+		maxTimeJtf.setMinimumSize(new Dimension(80,20));
+		maxTimeJtf.setPreferredSize(new Dimension(80,20));
 		hBoxTimeToTime.add(minTimeJtf);
 		hBoxTimeToTime.add(new JLabel(" to "));
 		hBoxTimeToTime.add(maxTimeJtf);
@@ -1717,13 +1716,19 @@ public class mxConnectionHandler extends mxMouseAdapter
 				for (JCheckBox cb : jcbLst) {
 					if (cb.isSelected()) {
 						objTypeSelectedLst.add(String.valueOf(cb.getText()));
-						
 						objFlag = true;
 					}
 				}
+			
+				
 				if (objFlag) {
 					timeType = jcb.getSelectedItem().toString();
+					if(timeType.equals("pooling time") && objTypeSelectedLst.size()!=1){
+							return;
+						}
+										
 					setActivityTimePerformanceConstraint((mxCell) cell, graph, timeType, actName, objTypeSelectedLst, minTime, maxTime, timeUnit);
+					
 					long minTimeInSeconds = getMinTime(minTime, timeUnit);
 					long maxTimeInSeconds = getMaxTime(maxTime, timeUnit);
 
@@ -1847,19 +1852,19 @@ public class mxConnectionHandler extends mxMouseAdapter
 		port2.setVisible(true);
 	}
 
-	public void setTimePerfConstraint(mxCell cell,
-									  mxGraph graph){
-		cell.setStyle("straight;startArrow=none;endArrow=none;" +
-				"strokeColor=#8B4513;strokeWidth=3");
-		mxGeometry geo2 = new mxGeometry(0, 0, 0,0);
-		geo2.setOffset(new mxPoint(14, 0));
-		geo2.setRelative(true);
-		mxCell port2 = new mxCell("鈮�1 day", geo2,
-				"shape=ellipse;perimeter=ellipsePerimeter");
-		port2.setVertex(true);
-		graph.addCell(port2, cell);
-		port2.setVisible(true);
-	}
+//	public void setTimePerfConstraint(mxCell cell,
+//									  mxGraph graph){
+//		cell.setStyle("straight;startArrow=none;endArrow=none;" +
+//				"strokeColor=#8B4513;strokeWidth=3");
+//		mxGeometry geo2 = new mxGeometry(0, 0, 0,0);
+//		geo2.setOffset(new mxPoint(14, 0));
+//		geo2.setRelative(true);
+//		mxCell port2 = new mxCell("鈮�1 day", geo2,
+//				"shape=ellipse;perimeter=ellipsePerimeter");
+//		port2.setVertex(true);
+//		graph.addCell(port2, cell);
+//		port2.setVisible(true);
+//	}
 
 
 	public void setActivityTimePerformanceConstraint(mxCell cell,
@@ -1872,8 +1877,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 										 String timeUnit){
 
 		cell.setStyle("straight;startArrow=none;endArrow=none;strokeColor=#8B4513;strokeWidth=3");
-
-//			String objTypeSelected = (String) objTypeSelectedLst.stream().collect(Collectors.joining(",", "{", "}"));
 		cell.setValue(objTypeSelectedLst.toString() +"\n(" + minTime + "," + maxTime + ", "+timeUnit+")");
 		cell.setTip("The " + timeType + " time for " + targetAct + " should be greater than " + minTime + " and less than "  + maxTime + timeUnit);
 	}

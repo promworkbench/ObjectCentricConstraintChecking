@@ -667,8 +667,7 @@ public class ProcessExecutionPanel extends JPanel
 		innerLeft1.setResizeWeight(0.2);
 		innerLeft1.setDividerSize(3);
 		innerLeft1.setBorder(null);
-		// -------- pane for pe
-
+		// -------- pane for process executions
 
 		JSplitPane outer2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				innerLeft1,

@@ -3,7 +3,12 @@
  */
 package org.processmining.cachealignment.algorithms.util;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class mxResources
@@ -160,7 +165,7 @@ public class mxResources
 			}
 		}
 
-		log.severe("Resource " + key + " not found in any bundle");
+//		log.severe("Resource " + key + " not found in any bundle");
 		return null;
 	}
 

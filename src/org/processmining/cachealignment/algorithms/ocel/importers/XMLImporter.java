@@ -117,7 +117,6 @@ public class XMLImporter extends AbstractImportPlugin {
 	}
 	
 	public void importGlobalEvent(OcelEventLog eventLog, Element globalEvent) {
-		System.out.println("called importGlobalEvent");
 		List<Element> children = globalEvent.getChildren();
 		for (Element inner : children) {
 			String type = inner.getName();

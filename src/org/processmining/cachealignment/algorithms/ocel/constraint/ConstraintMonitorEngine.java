@@ -68,6 +68,8 @@ public class ConstraintMonitorEngine implements Runnable{
             // select the corresponding constraint checker
             switch(consType){
                 case "activityTimeConstraint":
+                	System.out.print("check activity temporal constraint");
+
                     String tarAct = consMap.get(1).get("targetActivity").toString();
                     String timeType = consMap.get(2).get("timeType").toString();
                     long minTime = (long) consMap.get(3).get("minTime");
