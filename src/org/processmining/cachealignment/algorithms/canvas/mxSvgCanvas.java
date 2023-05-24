@@ -3,13 +3,7 @@
  */
 package org.processmining.cachealignment.algorithms.canvas;
 
-import org.processmining.cachealignment.algorithms.view.mxCellState;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import java.awt.*;
+import java.awt.Font;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.processmining.cachealignment.algorithms.util.mxBase64;
+import org.processmining.cachealignment.algorithms.util.mxConstants;
+import org.processmining.cachealignment.algorithms.util.mxPoint;
+import org.processmining.cachealignment.algorithms.util.mxRectangle;
+import org.processmining.cachealignment.algorithms.util.mxUtils;
+import org.processmining.cachealignment.algorithms.view.mxCellState;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * An implementation of a canvas that uses SVG for painting. This canvas
@@ -323,7 +326,7 @@ public class mxSvgCanvas extends mxBasicCanvas
 					+ mxBase64
 							.encodeToString(outputStream.toByteArray(), false);
 		}
-
+		inputStream.close();
 		return result;
 	}
 

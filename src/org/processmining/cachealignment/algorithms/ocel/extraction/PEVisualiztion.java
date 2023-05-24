@@ -1,5 +1,16 @@
 package org.processmining.cachealignment.algorithms.ocel.extraction;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+import javax.swing.JPanel;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
@@ -11,9 +22,6 @@ import org.processmining.framework.plugin.annotations.PluginVariant;
 import org.processmining.framework.util.ui.wizard.ListWizard;
 import org.processmining.framework.util.ui.wizard.ProMWizardDisplay;
 import org.processmining.framework.util.ui.wizard.ProMWizardStep;
-
-import javax.swing.*;
-import java.util.*;
 
 @Plugin(name = "Extract Process Execution",
 returnLabels = { "Process Execution Visualizer" },
@@ -244,8 +252,8 @@ public class PEVisualiztion {
 		// obj to consider for the obj
 		HashSet<OcelObject> objSet = new HashSet<>();
 		// get the distance of object type
-		HashMap<OcelObjectType, Integer> objTypeDistMap = new HashMap();
-		HashMap<OcelObject,Integer> objDistMap = new HashMap();
+		HashMap<OcelObjectType, Integer> objTypeDistMap = new HashMap<OcelObjectType, Integer>();
+		HashMap<OcelObject,Integer> objDistMap = new HashMap<OcelObject,Integer>();
 		Set<OcelObject> objVisited = new HashSet<>();
 
 		objDistMap.put(obj,0);

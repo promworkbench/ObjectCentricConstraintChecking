@@ -32,9 +32,6 @@ public class OcelObject {
 		this.sortedRelatedEvents = new ArrayList<OcelEvent>(relatedEvents);
 		Collections.sort(this.sortedRelatedEvents, new OcelEventComparator());
 		
-		if (false) {
-			printRelatedEvents();
-		}
 	}
 	
 	public void printRelatedEvents() {

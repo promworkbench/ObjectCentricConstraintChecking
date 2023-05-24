@@ -3,18 +3,24 @@
  */
 package org.processmining.cachealignment.algorithms.io;
 
-import org.processmining.cachealignment.algorithms.util.mxUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.processmining.cachealignment.algorithms.util.mxUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * Generic codec for Java objects. See below for a detailed description of
@@ -1213,7 +1219,7 @@ public class mxObjectCodec
 			// converted in setFieldValue
 			else if (obj instanceof Collection)
 			{
-				((Collection) obj).add(value);
+				((Collection<Object>) obj).add(value);
 			}
 		}
 	}

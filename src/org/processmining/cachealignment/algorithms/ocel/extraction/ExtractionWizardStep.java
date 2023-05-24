@@ -1,19 +1,21 @@
 package org.processmining.cachealignment.algorithms.ocel.extraction;
 
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.framework.util.ui.widgets.ProMComboBox;
 import org.processmining.framework.util.ui.widgets.ProMPropertiesPanel;
 import org.processmining.framework.util.ui.wizard.ProMWizardStep;
-import org.processmining.cachealignment.algorithms.ocel.extraction.PEModel;
 
 public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWizardStep<ExtractionWizardParameters> {
     OcelEventLog ocelLog;
@@ -32,13 +34,17 @@ public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWiz
         List<String> objectTypes = new ArrayList<String>(this.ocelLog.objectTypes.keySet());
 
         cm.allObjectTyps = objectTypes;
-
+        
         objectTypeList = addComboBox("Primary object type", objectTypes);
 
         JPanel jp2 = new JPanel();
         jp2.setLayout(new GridLayout(objectTypes.size(),1,0,0));
         for (String objType:objectTypes){
             JCheckBox objBox = new JCheckBox(objType);
+            if(objType.equals((String)objectTypeList.getSelectedItem())){
+            	objBox.setEnabled(false);
+            }
+                        
             objBox.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     revObjSet.add(objBox.getText());
@@ -50,6 +56,19 @@ public class ExtractionWizardStep extends ProMPropertiesPanel implements ProMWiz
                 });
             jp2.add(objBox);
         }
+        objectTypeList.addItemListener(e -> {
+        	Component[] components = jp2.getComponents();
+        	for (int i = 0; i < components.length; i++) {
+        	    if (components[i] instanceof JCheckBox) {
+        	        if(((JCheckBox) components[i]).getText().equals((String)objectTypeList.getSelectedItem())){
+        	        	((JCheckBox) components[i]).setEnabled(false);
+       				}
+        	        else{
+        	        	((JCheckBox) components[i]).setEnabled(true);
+        	        }
+        	    }
+        	}
+        });
         addProperty("Secondary object type(s)",jp2);
     }
 

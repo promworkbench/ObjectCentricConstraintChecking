@@ -1,12 +1,19 @@
 package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventComparator;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /*
  * @param null:
@@ -29,6 +36,8 @@ public class ConstraintPFTCM implements Runnable{
     public long timeMin;
 
     public long timeMax;
+    
+    public int constraintId;
 
     public String firstPattern;
 
@@ -46,7 +55,8 @@ public class ConstraintPFTCM implements Runnable{
                            long timeMax,
                            String firstPattern,
                            String secondPatten,
-                           Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap){
+                           Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+                           int constraintId){
         this.preAct = preAct;
         this.sucAct = sucAct;
         this.timeMin = timeMin;
@@ -54,6 +64,7 @@ public class ConstraintPFTCM implements Runnable{
         this.firstPattern = firstPattern;
         this.secondPatten = secondPatten;
         this.peMap = peMap;
+        this.constraintId = constraintId;
     }
 
 
@@ -74,7 +85,8 @@ public class ConstraintPFTCM implements Runnable{
                 timeMax,
                 firstPattern,
                 secondPatten,
-                peMap);
+                peMap,
+                constraintId);
     }
     
     public ViolatedSet getTemporalConstraint(
@@ -84,7 +96,8 @@ public class ConstraintPFTCM implements Runnable{
             long timeMax,
             String firstPattern,
             String secondPatten,
-            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap
+            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+            int constraintId
     ) throws ParseException {
         if (firstPattern.equals("First")&&secondPatten.equals("First")){
             return getFirstToFirstConstraint(
@@ -92,7 +105,8 @@ public class ConstraintPFTCM implements Runnable{
                     sucAct,
                     timeMin,
                     timeMax,
-                    peMap);
+                    peMap,
+                    constraintId);
         }
 
         else if (firstPattern.equals("First")&&secondPatten.equals("Last")){
@@ -101,7 +115,8 @@ public class ConstraintPFTCM implements Runnable{
                     sucAct,
                     timeMin,
                     timeMax,
-                    peMap);
+                    peMap,
+                    constraintId);
         }
 
         else if (firstPattern.equals("Last")&&secondPatten.equals("First")){
@@ -110,7 +125,8 @@ public class ConstraintPFTCM implements Runnable{
                     sucAct,
                     timeMin,
                     timeMax,
-                    peMap);
+                    peMap,
+                    constraintId);
         }
 
         else if (firstPattern.equals("Last")&&secondPatten.equals("Last")){
@@ -119,7 +135,8 @@ public class ConstraintPFTCM implements Runnable{
                     sucAct,
                     timeMin,
                     timeMax,
-                    peMap);
+                    peMap,
+                    constraintId);
         }
         return null;
     }
@@ -130,7 +147,8 @@ public class ConstraintPFTCM implements Runnable{
             String sucAct,
             long timeMin,
             long timeMax,
-            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap) throws ParseException
+            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+            int constraintId) throws ParseException
     {
         this.amount = peMap.keySet().size() - 1;
         this.current = 0;
@@ -170,7 +188,9 @@ public class ConstraintPFTCM implements Runnable{
                             peId,
                             evtLst,
                             preAct,
-                            "No succeeding activity " + sucAct + " after " +preAct+".");
+                            "No succeeding activity " + sucAct + " after " +preAct+".",
+                            constraintId
+                            );
                 } else {
                     sucEvtLst.sort(new OcelEventComparator());
 
@@ -196,7 +216,9 @@ public class ConstraintPFTCM implements Runnable{
                                 peId,
                                 evtLst,
                                 firstPreEvt.activity+","+firstSucEvt.activity,
-                                "The throughput time for first " + preAct + " and the first " + sucAct + " is not satisfied");
+                                "The throughput time for first " + preAct + " and the first " +
+                                sucAct + " is not satisfied",
+                                constraintId);
                     }
                 }
             }
@@ -211,7 +233,8 @@ public class ConstraintPFTCM implements Runnable{
             String sucAct,
             long timeMin,
             long timeMax,
-            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap) throws ParseException
+            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+            int constraintId) throws ParseException
     {
         this.amount = peMap.keySet().size() - 1;
         this.current = 0;
@@ -253,7 +276,8 @@ public class ConstraintPFTCM implements Runnable{
                             peId,
                             evtLst,
                             preAct,
-                            "No succeeding activity " + sucAct + " after " +preAct+".");
+                            "No succeeding activity " + sucAct + " after " +preAct+".",
+                            constraintId);
                 } else {
                     sucEvtLst.sort(new OcelEventComparator());
 
@@ -280,7 +304,9 @@ public class ConstraintPFTCM implements Runnable{
                                 peId,
                                 evtLst,
                                 firstPreEvt.activity+","+lastSucEvt.activity,
-                                "The throughput time between the first " + preAct + " and the last " + sucAct + " is not satisfied");
+                                "The throughput time between the first " + preAct + 
+                                " and the last " + sucAct + " is not satisfied",
+                                constraintId);
                     }
                 }
             }
@@ -296,7 +322,8 @@ public class ConstraintPFTCM implements Runnable{
             String sucAct,
             long timeMin,
             long timeMax,
-            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap) throws ParseException
+            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+            int constraintId) throws ParseException
     {
         this.amount = peMap.keySet().size() - 1;
         this.current = 0;
@@ -338,7 +365,7 @@ public class ConstraintPFTCM implements Runnable{
                             peId,
                             evtLst,
                             preAct,
-                            "No succeeding activity " + sucAct + " after " +preAct+".");
+                            "No succeeding activity " + sucAct + " after " +preAct+".",constraintId);
                 } else {
                     sucEvtLst.sort(new OcelEventComparator());
 
@@ -364,7 +391,9 @@ public class ConstraintPFTCM implements Runnable{
                                 peId,
                                 evtLst,
                                 lastPreEvt.activity+","+firstSucEvt.activity,
-                                "The throughput time between the last " + preAct + " and the first " + sucAct + " is not satisfied");
+                                "The throughput time between the last " + preAct 
+                                + " and the first " + sucAct + " is not satisfied",
+                                constraintId);
                     }
                 }
             }
@@ -380,7 +409,8 @@ public class ConstraintPFTCM implements Runnable{
             String sucAct,
             long timeMin,
             long timeMax,
-            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap) throws ParseException
+            Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+            int constraintId) throws ParseException
     {
         this.amount = peMap.keySet().size() - 1;
         this.current = 0;
@@ -422,7 +452,7 @@ public class ConstraintPFTCM implements Runnable{
                             peId,
                             evtLst,
                             preAct,
-                            "No succeeding activity " + sucAct + " after " +preAct+".");
+                            "No succeeding activity " + sucAct + " after " +preAct+".",constraintId);
                 } else {
                     sucEvtLst.sort(new OcelEventComparator());
 
@@ -448,7 +478,8 @@ public class ConstraintPFTCM implements Runnable{
                                 peId,
                                 evtLst,
                                 lastPreEvt.activity+","+lastSucEvt.activity,
-                                "The throughput time between the last " + preAct + " and the last " + sucAct + " is not satisfied");
+                                "The throughput time between the last " + preAct + 
+                                " and the last " + sucAct + " is not satisfied",constraintId);
                     }
                 }
             }
@@ -464,7 +495,7 @@ public class ConstraintPFTCM implements Runnable{
             OcelEvent preEvt,
             HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtMap,
             String sucAct,
-            List objTypeLst){
+            List<String> objTypeLst){
 
         HashMap<OcelEvent,HashSet<OcelObject>> evtObjSet = evtMap.get(preEvt);
         // iterate each event in the evtObjSet
@@ -505,7 +536,8 @@ public class ConstraintPFTCM implements Runnable{
                     timeMax,
                     firstPattern,
                     secondPatten,
-                    peMap);
+                    peMap,
+                    constraintId);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

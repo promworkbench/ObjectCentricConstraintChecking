@@ -2,11 +2,19 @@
  * Copyright (c) 2006-2012, JGraph Ltd */
 package org.processmining.cachealignment.algorithms.ocel.occl;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.net.URL;
 import java.text.NumberFormat;
-import java.util.*;
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 import org.processmining.cachealignment.algorithms.analysis.mxAnalysisGraph;
 import org.processmining.cachealignment.algorithms.analysis.mxGraphGenerator;
@@ -14,24 +22,21 @@ import org.processmining.cachealignment.algorithms.analysis.mxGraphProperties;
 import org.processmining.cachealignment.algorithms.editor.ActEditorPalette;
 import org.processmining.cachealignment.algorithms.editor.BasicGraphEditor;
 import org.processmining.cachealignment.algorithms.editor.objEditorPalette;
+import org.processmining.cachealignment.algorithms.io.mxCodec;
+import org.processmining.cachealignment.algorithms.layout.mxFastOrganicLayout;
 import org.processmining.cachealignment.algorithms.model.mxCell;
 import org.processmining.cachealignment.algorithms.model.mxGeometry;
 import org.processmining.cachealignment.algorithms.model.mxICell;
 import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
 import org.processmining.cachealignment.algorithms.swing.mxGraphComponent;
 import org.processmining.cachealignment.algorithms.swing.util.mxGraphTransferable;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.processmining.cachealignment.algorithms.view.mxGraph;
-import org.processmining.cachealignment.algorithms.editor.*;
-import org.processmining.cachealignment.algorithms.layout.mxFastOrganicLayout;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.w3c.dom.Document;
-
-import org.processmining.cachealignment.algorithms.io.mxCodec;
 import org.processmining.cachealignment.algorithms.util.mxEvent;
 import org.processmining.cachealignment.algorithms.util.mxEventObject;
+import org.processmining.cachealignment.algorithms.util.mxEventSource;
 import org.processmining.cachealignment.algorithms.util.mxPoint;
 import org.processmining.cachealignment.algorithms.util.mxUtils;
+import org.processmining.cachealignment.algorithms.view.mxGraph;
+import org.w3c.dom.Document;
 
 public class GraphEditor extends BasicGraphEditor
 {
@@ -322,6 +327,7 @@ public class GraphEditor extends BasicGraphEditor
 		 * is not a valid drop target and the cells are of the same
 		 * type (eg. both vertices or both edges).
 		 */
+		@SuppressWarnings("finally")
 		public Object[] importCells(Object[] cells, double dx, double dy,
 									Object target, Point location)
 		{

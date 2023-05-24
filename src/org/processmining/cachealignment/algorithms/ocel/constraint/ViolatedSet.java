@@ -14,12 +14,14 @@ public class ViolatedSet {
     public void appendViolatedRule(String caseId,
                                    ArrayList<String> eventId,
                                    String activity,
-                                   String diagnosis){
+                                   String diagnosis,
+                                   int constraintId){
         ArrayList violatedRule = new ArrayList<>();
         violatedRule.add(caseId);
         violatedRule.add(eventId);
         violatedRule.add(activity);
         violatedRule.add(diagnosis);
+        violatedRule.add(constraintId);
         violatedRules.add(violatedRule);
     }
 

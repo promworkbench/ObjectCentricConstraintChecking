@@ -1,13 +1,19 @@
 package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventComparator;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 public class ConstraintTPCM implements Runnable{
 
@@ -27,9 +33,11 @@ public class ConstraintTPCM implements Runnable{
     public String targetActivity;
 
     public OcelEventLog ocel;
+    
+    public int constraintId;
 
     public Map<String, HashMap<OcelEvent, HashMap<OcelEvent, HashSet<OcelObject>>>> peMap;
-    public List objTypeLst;
+    public List<String> objTypeLst;
     public ConstraintTPCM(){
 
     }
@@ -41,7 +49,8 @@ public class ConstraintTPCM implements Runnable{
             long minTime,
             long maxTime,
             String timeUnit,
-            List objTypeLst){
+            List<String> objTypeLst,
+            int constraintId){
         this.ocel = ocel;
         this.targetActivity = targetActivity;
         this.timeType = timeType;
@@ -49,6 +58,7 @@ public class ConstraintTPCM implements Runnable{
         this.maxTime = maxTime;
         this.timeUnit = timeUnit;
         this.objTypeLst = objTypeLst;
+        this.constraintId = constraintId;
     }
 
 
@@ -81,7 +91,7 @@ public class ConstraintTPCM implements Runnable{
             long minTime,
           long maxTime,
           String timeUnit,
-          List objTypeLst) throws ParseException {
+          List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
 
@@ -146,7 +156,8 @@ public class ConstraintTPCM implements Runnable{
                                     evt.id,
                                     new ArrayList<>(),
                                     objSet.toString(),
-                                    "The waiting time is " + waitingTime + " " + timeUnit + " , does not match the constraint " + "(" + minTime + "," + maxTime + ") " + timeUnit);
+                                    "The waiting time is " + waitingTime + " " + timeUnit + " , does not match the constraint " + "(" + minTime + "," + maxTime + ") " + timeUnit,
+                                    constraintId);
                         }
                     }
                 }
@@ -158,7 +169,7 @@ public class ConstraintTPCM implements Runnable{
     public ViolatedSet getPoolingTime(
             OcelEventLog ocel,
             String targetActivity,
-        long minTime, long maxTime, List objTypeLst) throws ParseException {
+        long minTime, long maxTime, List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -192,7 +203,8 @@ public class ConstraintTPCM implements Runnable{
                                 evt.id,
                                 new ArrayList<>(),
                                 objLst.toString(),
-                                "The Pooling time (" + PoolingTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")");
+                                "The Pooling time (" + PoolingTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")",
+                                constraintId);
                     }
                 }
             }
@@ -204,7 +216,7 @@ public class ConstraintTPCM implements Runnable{
     }
 
 
-    public ViolatedSet getSynchronizationTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List objTypeLst) throws ParseException {
+    public ViolatedSet getSynchronizationTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -235,7 +247,8 @@ public class ConstraintTPCM implements Runnable{
                             evt.id,
                             new ArrayList<>(),
                             objLst.toString(),
-                            "The Synchronization time (" + SynchronizationTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")");
+                            "The Synchronization time (" + SynchronizationTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")",
+                            constraintId);
                 }
 
             }
@@ -248,7 +261,8 @@ public class ConstraintTPCM implements Runnable{
 
 
 
-    public ViolatedSet getLaggingTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List objTypeLst) throws ParseException {
+    public ViolatedSet getLaggingTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, 
+    		List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -280,7 +294,7 @@ public class ConstraintTPCM implements Runnable{
                             evt.id,
                             new ArrayList<>(),
                             objLst.toString(),
-                            "The Lagging time ("+LaggingTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")");
+                            "The Lagging time ("+LaggingTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")", constraintId);
                 }
             }
             this.current+=1;
@@ -292,7 +306,7 @@ public class ConstraintTPCM implements Runnable{
     }
 
 
-    public ViolatedSet getResponseTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List objTypeLst) throws ParseException {
+    public ViolatedSet getResponseTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -329,7 +343,8 @@ public class ConstraintTPCM implements Runnable{
                                 evt.id,
                                 new ArrayList<>(),
                                 objLst.toString(),
-                                "The Response time (" + ResponseTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")");
+                                "The Response time (" + ResponseTime + ") does not match the constraint " + "(" + minTime + "," + maxTime + ")",
+                                constraintId);
                     }
                 }
             }
@@ -341,7 +356,7 @@ public class ConstraintTPCM implements Runnable{
         return vs;
     }
 
-    public ViolatedSet getThroughputTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List objTypeLst) throws ParseException {
+    public ViolatedSet getThroughputTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -372,7 +387,7 @@ public class ConstraintTPCM implements Runnable{
                             evt.id,
                             new ArrayList<>(),
                             objLst.toString(),
-                            "The Throughput time ("+ThroughputTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")");
+                            "The Throughput time ("+ThroughputTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")", constraintId);
                 }
             }
         }
@@ -382,7 +397,8 @@ public class ConstraintTPCM implements Runnable{
     }
 
 
-    public ViolatedSet getCloggingTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, List objTypeLst) throws ParseException {
+    public ViolatedSet getCloggingTime(OcelEventLog ocel, String targetActivity, long minTime, long maxTime, 
+    		List<String> objTypeLst) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
         for (OcelEvent evt: ocel.events.values()) {
@@ -413,7 +429,7 @@ public class ConstraintTPCM implements Runnable{
                             evt.id,
                             new ArrayList<>(),
                             objLst.toString(),
-                            "The Clogging time ("+CloggingTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")");
+                            "The Clogging time ("+CloggingTime +") does not match the constraint "+"("+ minTime+ "," + maxTime+")", constraintId);
                 }
             }
         }

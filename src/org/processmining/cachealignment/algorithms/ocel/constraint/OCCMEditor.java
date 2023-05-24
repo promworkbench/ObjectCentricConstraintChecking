@@ -77,7 +77,6 @@ import org.processmining.cachealignment.algorithms.model.mxCell;
 import org.processmining.cachealignment.algorithms.model.mxGeometry;
 import org.processmining.cachealignment.algorithms.model.mxICell;
 import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
-import org.processmining.cachealignment.algorithms.ocel.constraint.CaseExtraction;
 import org.processmining.cachealignment.algorithms.ocel.occl.GraphEditor;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventComparator;
@@ -121,6 +120,8 @@ public class OCCMEditor extends JPanel
 	static String objTypeSelected;
 
 	static ArrayList<String> objTypeList1;
+	
+	JComboBox<String> constraintJCB;
 	/**
 	 *
 	 */
@@ -161,6 +162,7 @@ public class OCCMEditor extends JPanel
 	protected JTabbedPane performancePane;
 	protected JTabbedPane restPane;
 	protected JSplitPane outer3;
+	protected JSplitPane resultPanel2;
 
 	/**
 	 *
@@ -241,6 +243,7 @@ public class OCCMEditor extends JPanel
 
 		// Stores a reference to the graph and creates the command history
 		graphComponent = new CustomGraphComponent(new CustomGraph());
+		graphComponent.setPageScale(1.5);
 		final mxGraph graph = graphComponent.getGraph();
 
 		// disallow the edge disconnecting with vertex.
@@ -295,26 +298,6 @@ public class OCCMEditor extends JPanel
 		hBox.add(Box.createHorizontalStrut(10));
 		hBox.add(checkBtn);
 
-		refreshBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				graph.getModel().beginUpdate();
-				graph.getModel().endUpdate();
-			}
-		});
-
-		// reset the graph
-		resetBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				cm.consLst = new ArrayList<>();
-				graph.getModel().beginUpdate();
-				graph.selectAll();
-				graph.removeCells();
-				graph.refresh();
-				graph.getModel().endUpdate();
-			}
-		});
 
 		// -------- pane for process execution
 		JTable table = getEvtTable(
@@ -438,9 +421,13 @@ public class OCCMEditor extends JPanel
 								new mxGeometry((widthLayout - width)/2,
 										(heightLayout - height)/2,
 										widthLayout, heightLayout));
+					
 
 						System.out.println("set the layout of p1"+graph.getView().getScale());
+					    
 						graph.getModel().endUpdate();
+					
+					
 					}
 				}
 				else if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -627,8 +614,6 @@ public class OCCMEditor extends JPanel
 		inner4.setDividerSize(6);
 		inner4.setBorder(null);
 
-		// ---------- library pane that contains the tabs with the palettes
-
 		// Creates the outer split pane that contains the inner split pane and
 		// the graph component on the right side of the window
 		JSplitPane outer = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -648,12 +633,94 @@ public class OCCMEditor extends JPanel
 		outer2.setDividerSize(25);
 		outer2.setBorder(null);
 
+		Box hBox1 = Box.createVerticalBox();
+		constraintJCB = new JComboBox<String>();
+		constraintJCB.setMaximumSize(new Dimension(100, 20));
+		constraintJCB.setMinimumSize(new Dimension(100, 20));
+		constraintJCB.setPreferredSize(new Dimension(100, 20));
+		constraintJCB.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                // Perform actions when an item is selected in the JComboBox
+	                JComboBox<String> source = (JComboBox<String>) e.getSource();
+	                int selectedItemIdx = (int) source.getSelectedIndex();
+	                
+	                Object[] title = {"Primary object", "Event id", "Activity name", "Diagnosis"};
+					Vector titlesV = new Vector(); // save title
+					Vector<Vector> dataV = new Vector<Vector>(); // save data
+
+					Collections.addAll(titlesV, title);
+					int count = 0;
+					while (cm.vs.violatedRules.size()>count) {
+						if((int)cm.vs.violatedRules.get(count).get(4) == selectedItemIdx){
+							Vector<Object> violations = new Vector<Object>();
+							violations.add(cm.vs.violatedRules.get(count).get(0));
+							violations.add(cm.vs.violatedRules.get(count).get(1));
+							violations.add(cm.vs.violatedRules.get(count).get(2));
+							violations.add(cm.vs.violatedRules.get(count).get(3));
+							dataV.add(violations);
+						}
+						count += 1;
+					}
+					TableModel model = new DefaultTableModel(dataV, titlesV){
+						//
+						@Override
+						public boolean isCellEditable(int row, int column) {
+							//all cells false
+							return false;
+						}
+					};
+
+					double dividerLocation = 0.1;
+					Component[] components = resultPanel2.getComponents();
+					for (Component c : components) {
+						if (c instanceof JPanel) {
+							resultPanel2.remove(c);
+						}
+					}
+					JPanel newChild = new JPanel(new BorderLayout());
+					try {
+						JTable table = new JTable(model);
+						TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
+						table.setRowSorter(sorter);
+						List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+						sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+						sorter.setSortKeys(sortKeys);
+						JScrollPane scrollPane=new JScrollPane(table);
+						newChild.add(scrollPane);
+					} catch (ParseException ex) {
+						throw new RuntimeException(ex);
+					}
+					resultPanel2.add(newChild);
+					resultPanel2.setDividerLocation(dividerLocation);
+					newChild.revalidate();
+					newChild.repaint();
+	            }
+	        });
+		
+		hBox1.add(Box.createVerticalStrut(20));
+		Box vConsBox = Box.createHorizontalBox();
+		vConsBox.add(Box.createHorizontalStrut(20));
+		vConsBox.add(new JLabel("Select constraint: "));
+		vConsBox.add(Box.createHorizontalStrut(20));
+		vConsBox.add(constraintJCB);
+		vConsBox.add(Box.createHorizontalStrut(20));
+
+		// the split pane for resultPanel1 and violation table
+		resultPanel2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+				vConsBox, violationTablePanel
+		);
+		resultPanel2.setResizeWeight(0.1);
+		resultPanel2.setOneTouchExpandable(true);
+		resultPanel2.setDividerSize(5);
+		resultPanel2.setBorder(null);
+
 		outer3 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 				outer2,
-				violationTablePanel);
+				resultPanel2);
 //		outer.setOneTouchExpandable(true);
 //		inner.setResizeWeight(0.3);
-		outer3.setResizeWeight(0.99);
+		outer3.setResizeWeight(0.7);
 		outer3.setOneTouchExpandable(true);
 		outer3.setDividerSize(25);
 		outer3.setBorder(null);
@@ -787,16 +854,62 @@ public class OCCMEditor extends JPanel
 
 		updateTitle();
 
+
+		refreshBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				graph.getModel().beginUpdate();
+				graph.getModel().endUpdate();
+			}
+		});
+
+		// reset the graph
+		resetBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cm.consLst = new ArrayList<>();
+				Integer constraintNum = constraintJCB.getItemCount();
+				Integer constraintId = 0;
+				while(constraintId < constraintNum){
+					System.out.print("add item to jcombo box");
+					constraintJCB.removeItemAt(constraintId++);
+				}
+				graph.getModel().beginUpdate();
+				graph.selectAll();
+				graph.removeCells();
+				graph.refresh();
+				graph.getModel().endUpdate();
+			}
+		});
+		
 		checkBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cm.vs.violatedRules = new ArrayList<>();
+
+				System.out.println("get the output constraint list"+cm.consLst);
+
 				ProgressMonitor pm = new ProgressMonitor(null,
 						"Waiting for results","Already done:",
 						0,3);
+
 				// get the amount of constraints to check
 				// start the child thread
-				ConstraintMonitorEngine simulaterActivity = new ConstraintMonitorEngine(cm.consLst.size());
+				int constraintNum = cm.consLst.size();
+				
+				ConstraintMonitorEngine simulaterActivity = new ConstraintMonitorEngine(constraintNum);
+				
+				
+//				constraintJCB.setMaximumSize(new Dimension(100, 20));
+//				constraintJCB.setMinimumSize(new Dimension(100, 20));
+//				constraintJCB.setPreferredSize(new Dimension(100, 20));
+//				
+				Integer constraintId = constraintJCB.getItemCount();;
+				while(constraintId < constraintNum){
+					constraintJCB.addItem("Constraint "+(++constraintId).toString());
+				}
+				revalidate();
+				
 				simulaterActivity.setCurrent(0);
 				new Thread(simulaterActivity).start();
 
@@ -816,19 +929,21 @@ public class OCCMEditor extends JPanel
 							violationTablePanel.setBackground(new Color(100, 100, 100));
 							violationTablePanel.setLayout(new BorderLayout());
 
-							Object[] title = {"Case id", "Event id", "Activity name", "Diagnosis"};
+							Object[] title = {"Primary object", "Event id", "Activity name", "Diagnosis"};
 							Vector titlesV = new Vector(); // save title
 							Vector<Vector> dataV = new Vector<Vector>(); // save data
 
 							Collections.addAll(titlesV, title);
 							int count = 0;
 							while (cm.vs.violatedRules.size()>count) {
-								Vector<Object> violations = new Vector<Object>();
-								violations.add(cm.vs.violatedRules.get(count).get(0));
-								violations.add(cm.vs.violatedRules.get(count).get(1));
-								violations.add(cm.vs.violatedRules.get(count).get(2));
-								violations.add(cm.vs.violatedRules.get(count).get(3));
-								dataV.add(violations);
+								if((int)cm.vs.violatedRules.get(count).get(4) == 0){
+									Vector<Object> violations = new Vector<Object>();
+									violations.add(cm.vs.violatedRules.get(count).get(0));
+									violations.add(cm.vs.violatedRules.get(count).get(1));
+									violations.add(cm.vs.violatedRules.get(count).get(2));
+									violations.add(cm.vs.violatedRules.get(count).get(3));
+									dataV.add(violations);
+								}
 								count += 1;
 							}
 							TableModel model = new DefaultTableModel(dataV, titlesV){
@@ -840,145 +955,144 @@ public class OCCMEditor extends JPanel
 								}
 							};
 
-							double dividerLocation = 0.4;
-							Component[] components = outer3.getComponents();
+							double dividerLocation = 0.1;
+							Component[] components = resultPanel2.getComponents();
 							for (Component c : components) {
 								if (c instanceof JPanel) {
-									outer3.remove(c);
+									resultPanel2.remove(c);
 								}
 							}
 							JPanel newChild = new JPanel(new BorderLayout());
 							try {
 								JTable table = new JTable(model);
-
-								table.addMouseListener(new MouseAdapter() {
-									@Override
-									public void mouseClicked(MouseEvent e) {
-
-										// get selected row
-										selectedRow = table.getSelectedRow();
-										graph.getModel().beginUpdate();
-										graph.selectAll();
-										graph.removeCells();
-
-										Object parent = graph.getDefaultParent();
-										String leadingObj = (String) table.getModel().getValueAt(
-												selectedRow, 0);
-
-										if (leadingObj.equals("")){
-											return;
-										}
-										// get all the node
-										Set<OcelEvent> evtLst =  peMap.get(leadingObj).keySet();
-
-										List<OcelEvent> mainList = new ArrayList<OcelEvent>();
-										mainList.addAll(evtLst);
-
-										Collections.sort(mainList, new OcelEventComparator());
-										Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
-
-										HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
-
-										Set<OcelEvent> allEvt = new HashSet<>();
-										for (OcelEvent evt : mainList) {
-											allEvt.add(evt);
-											HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
-											for(OcelEvent dfEvt: dfEvtMap.keySet()) {
-												allEvt.add(dfEvt);
-											}
-										}
-										List<OcelEvent> allEvtList = new ArrayList<OcelEvent>();
-										allEvtList.addAll(allEvt);
-
-										Collections.sort(allEvtList, new OcelEventComparator());
-
-
-										Object[] vertices = new Object[allEvt.size()];
-//				ArrayList<Object[]> vertices = new ArrayList<>();
-
-										int i = 0;
-
-										Map<OcelEvent,Integer> evtToNodeMap = new HashMap<>();
-
-										ArrayList evtIdLst = (ArrayList) table.getModel().getValueAt(
-												selectedRow, 1);
-
-										// first get the node
-										for (OcelEvent evt : allEvtList) {
-
-											if (evtIdLst.contains(evt.id)){
-												vertices[i] = graph.insertVertex(parent,
-														evt.id,
-														evt.activity + "\n" + evt.timestamp,
-														200, 0,
-														120,
-														50,
-														"ellipse;fontSize=14;fillColor=#FF0000;fontColor=#000000");
-												edgeIdxToEvtId.put(evt.id, i);
-												evtToNodeMap.put(evt, i);
-											}
-											else {
-												vertices[i] = graph.insertVertex(parent,
-														evt.id,
-														evt.activity + "\n" + evt.timestamp,
-														200, 0,
-														120,
-														50,
-														"ellipse;fontSize=12");
-												edgeIdxToEvtId.put(evt.id, i);
-												evtToNodeMap.put(evt, i);
-											}
-											i += 1;
-										}
-
-										// then get the edge, iterate every event
-										for(OcelEvent evt:mainList){
-
-											// get all direct follow events
-											HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
-
-											// add an edge them if there is a shared object
-											for(OcelEvent dfEvt: dfEvtMap.keySet()) {
-
-
-												HashSet<OcelObject> objSet = dfEvtMap.get(dfEvt);
-												// iterate every obj
-												for (OcelObject obj:objSet) {
-													if (cm.revObjTypes.contains(obj.objectType.name)||
-															obj.id.equals(leadingObj)){
-														graph.insertEdge(parent,
-																null,
-																obj.id,
-																vertices[evtToNodeMap.get(evt)],
-																vertices[evtToNodeMap.get(dfEvt)],
-																"startArrow=none;endArrow=classic;fontSize=8;strokeWidth=1");
-													}
-
-												}
-											}
-										}
-
-										// set layout of the process exe
-										mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-										layout.setParallelEdgeSpacing(120);
-										layout.setIntraCellSpacing(150);
-										layout.setInterRankCellSpacing(80);
-										layout.setInterHierarchySpacing(120);
-										layout.execute(graph.getDefaultParent());
-
-										double width = graph.getGraphBounds().getWidth();
-										double height = graph.getGraphBounds().getHeight();
-										double widthLayout = graphComponent.getLayoutAreaSize().getWidth();
-										double heightLayout = graphComponent.getLayoutAreaSize().getHeight();
-										graph.getModel().setGeometry(graph.getDefaultParent(),
-												new mxGeometry((widthLayout - width)/2,
-														(heightLayout - height)/2,
-														widthLayout, heightLayout));
-
-										graph.getModel().endUpdate();
-									}
-								});
-
+//								table.addMouseListener(new MouseAdapter() {
+////									@Override
+////									public void mouseClicked(MouseEvent e) {
+////
+////										// get selected row
+////										selectedRow = table.getSelectedRow();
+////										graph.getModel().beginUpdate();
+////										graph.selectAll();
+////										graph.removeCells();
+////
+////										Object parent = graph.getDefaultParent();
+////										String leadingObj = (String) table.getModel().getValueAt(
+////												selectedRow, 0);
+////
+////										if (leadingObj.equals("")){
+////											return;
+////										}
+////										// get all the node
+////										Set<OcelEvent> evtLst =  peMap.get(leadingObj).keySet();
+////
+////										List<OcelEvent> mainList = new ArrayList<OcelEvent>();
+////										mainList.addAll(evtLst);
+////
+////										Collections.sort(mainList, new OcelEventComparator());
+////										Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
+////
+////										HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
+////
+////										Set<OcelEvent> allEvt = new HashSet<>();
+////										for (OcelEvent evt : mainList) {
+////											allEvt.add(evt);
+////											HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
+////											for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+////												allEvt.add(dfEvt);
+////											}
+////										}
+////										List<OcelEvent> allEvtList = new ArrayList<OcelEvent>();
+////										allEvtList.addAll(allEvt);
+////
+////										Collections.sort(allEvtList, new OcelEventComparator());
+////
+////
+////										Object[] vertices = new Object[allEvt.size()];
+//////				ArrayList<Object[]> vertices = new ArrayList<>();
+////
+////										int i = 0;
+////
+////										Map<OcelEvent,Integer> evtToNodeMap = new HashMap<>();
+////
+////										ArrayList evtIdLst = (ArrayList) table.getModel().getValueAt(
+////												selectedRow, 1);
+////
+////										// first get the node
+////										for (OcelEvent evt : allEvtList) {
+////
+////											if (evtIdLst.contains(evt.id)){
+////												vertices[i] = graph.insertVertex(parent,
+////														evt.id,
+////														evt.activity + "\n" + evt.timestamp,
+////														200, 0,
+////														120,
+////														50,
+////														"ellipse;fontSize=14;fillColor=#FF0000;fontColor=#000000");
+////												edgeIdxToEvtId.put(evt.id, i);
+////												evtToNodeMap.put(evt, i);
+////											}
+////											else {
+////												vertices[i] = graph.insertVertex(parent,
+////														evt.id,
+////														evt.activity + "\n" + evt.timestamp,
+////														200, 0,
+////														120,
+////														50,
+////														"ellipse;fontSize=12");
+////												edgeIdxToEvtId.put(evt.id, i);
+////												evtToNodeMap.put(evt, i);
+////											}
+////											i += 1;
+////										}
+////
+////										// then get the edge, iterate every event
+////										for(OcelEvent evt:mainList){
+////
+////											// get all direct follow events
+////											HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
+////
+////											// add an edge them if there is a shared object
+////											for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+////
+////
+////												HashSet<OcelObject> objSet = dfEvtMap.get(dfEvt);
+////												// iterate every obj
+////												for (OcelObject obj:objSet) {
+////													if (cm.revObjTypes.contains(obj.objectType.name)||
+////															obj.id.equals(leadingObj)){
+////														graph.insertEdge(parent,
+////																null,
+////																obj.id,
+////																vertices[evtToNodeMap.get(evt)],
+////																vertices[evtToNodeMap.get(dfEvt)],
+////																"startArrow=none;endArrow=classic;fontSize=8;strokeWidth=1");
+////													}
+////
+////												}
+////											}
+////										}
+////
+////										// set layout of the process exe
+////										mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+////										layout.setParallelEdgeSpacing(120);
+////										layout.setIntraCellSpacing(150);
+////										layout.setInterRankCellSpacing(80);
+////										layout.setInterHierarchySpacing(120);
+////										layout.execute(graph.getDefaultParent());
+////
+////										double width = graph.getGraphBounds().getWidth();
+////										double height = graph.getGraphBounds().getHeight();
+////										double widthLayout = graphComponent.getLayoutAreaSize().getWidth();
+////										double heightLayout = graphComponent.getLayoutAreaSize().getHeight();
+////										graph.getModel().setGeometry(graph.getDefaultParent(),
+////												new mxGeometry((widthLayout - width)/2,
+////														(heightLayout - height)/2,
+////														widthLayout, heightLayout));
+////
+////										graph.getModel().endUpdate();
+////									}
+////								});
+//
 								TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(table.getModel());
 								table.setRowSorter(sorter);
 								List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
@@ -989,8 +1103,8 @@ public class OCCMEditor extends JPanel
 							} catch (ParseException ex) {
 								throw new RuntimeException(ex);
 							}
-							outer3.add(newChild);
-							outer3.setDividerLocation(dividerLocation);
+							resultPanel2.add(newChild);
+							resultPanel2.setDividerLocation(dividerLocation);
 							newChild.revalidate();
 							newChild.repaint();
 
@@ -1152,6 +1266,8 @@ public class OCCMEditor extends JPanel
 
 				System.out.println("set the layout of p3 "+ width
 						+ " "+ height +" "+widthLayout +" "+heightLayout);
+				
+
 
 				graph.getModel().endUpdate();
 			}
@@ -1517,6 +1633,7 @@ public class OCCMEditor extends JPanel
 	 */
 	public mxGraphComponent getGraphComponent()
 	{
+		graphComponent.DEFAULT_PAGESCALE = 1;
 		return graphComponent;
 	}
 
@@ -1967,6 +2084,7 @@ public class OCCMEditor extends JPanel
 		 * is not a valid drop target and the cells are of the same
 		 * type (eg. both vertices or both edges).
 		 */
+		@SuppressWarnings("finally")
 		public Object[] importCells(Object[] cells, double dx, double dy,
 									Object target, Point location)
 		{
@@ -2041,7 +2159,7 @@ public class OCCMEditor extends JPanel
 		JDialog dialog = new JDialog();
 		dialog.setAlwaysOnTop(true);
 		dialog.setTitle("Time Performance Constraint");
-		dialog.setSize(new Dimension(300,100));
+		dialog.setSize(new Dimension(400,100));
 		dialog.setVisible(true);
 		dialog.setLocationRelativeTo(null);  // set to the center of the screen
 		Box hBox = Box.createHorizontalBox();
@@ -2256,6 +2374,10 @@ public class OCCMEditor extends JPanel
 
 		return ports;
 	}
+
+//	public static void main(String[] args) {
+//		System.getProperty("user.dir")
+//	}
 
 
 //	public static void main(String[] args)

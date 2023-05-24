@@ -58,7 +58,7 @@ public class ConstraintMonitorEngine implements Runnable{
             // get the corresponding constraint
             ArrayList<Map> consMap = cm.consLst.get(current);
 
-            List objTypeLst;
+            List<String> objTypeLst;
 
             // get the corresponding constraint type
             String consType = consMap.get(0).get("constraintType").toString();
@@ -81,7 +81,8 @@ public class ConstraintMonitorEngine implements Runnable{
                             minTime,
                             maxTime,
                             timeUnit,
-                            objTypeLst);
+                            objTypeLst,
+                            current);
                     try {
                         vs = tpcm.getViolationSet();
                     } catch (ParseException e) {
@@ -98,7 +99,8 @@ public class ConstraintMonitorEngine implements Runnable{
                             actName,
                             refObjType,
                             minCard,
-                            maxCard);
+                            maxCard,
+                            current);
                     try {
                         vs = occm.getViolationSet();
                     } catch (ParseException e) {
@@ -113,7 +115,8 @@ public class ConstraintMonitorEngine implements Runnable{
                             cm.peMap,
                             refActName,
                             minFreq,
-                            maxFreq);
+                            maxFreq,
+                            current);
                     try {
                         vs = fcm.getViolationSet();
                     } catch (ParseException e) {
@@ -135,7 +138,8 @@ public class ConstraintMonitorEngine implements Runnable{
                             sucAct,
                             sucActCardMin,
                             sucActCardMax,
-                            cm.peMap);
+                            cm.peMap,
+                            current);
                     try {
                         vs = pfccm.getViolationSet();
                     } catch (ParseException e) {
@@ -157,7 +161,8 @@ public class ConstraintMonitorEngine implements Runnable{
                             timeMax,
                             firstPattern,
                             secondPatten,
-                            cm.peMap);
+                            cm.peMap,
+                            current);
                     try {
                         vs = pftcm.getViolationSet();
                     } catch (ParseException e) {

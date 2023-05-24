@@ -1,10 +1,14 @@
 package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-
-import java.text.ParseException;
-import java.util.*;
 
 // class for frequency constraint
 
@@ -14,7 +18,10 @@ public class ConstraintFCM implements Runnable{
     private int amount;
     public int minFreq;
     public int maxFreq;
+    public int constraintId;
+   
     int actCount = 0;
+    
     public String targetActivity;
     public Map<String, HashMap<OcelEvent, HashMap<OcelEvent, HashSet<OcelObject>>>> peMap;
 
@@ -26,11 +33,13 @@ public class ConstraintFCM implements Runnable{
             Map<String, HashMap<OcelEvent, HashMap<OcelEvent, HashSet<OcelObject>>>> peMap,
             String targetActivity,
             int minFreq,
-            int maxFreq){
+            int maxFreq,
+            int constraintId){
         this.peMap = peMap;
         this.targetActivity = targetActivity;
         this.minFreq = minFreq;
         this.maxFreq = maxFreq;
+        this.constraintId = constraintId;
     }
 
     public int getAmount(){
@@ -45,14 +54,16 @@ public class ConstraintFCM implements Runnable{
         return getObjCardConstraint(peMap,
                 targetActivity,
                 minFreq,
-                maxFreq);
+                maxFreq,
+                constraintId);
     }
 
     public ViolatedSet getObjCardConstraint(
             Map<String, HashMap<OcelEvent, HashMap<OcelEvent, HashSet<OcelObject>>>> peMap,
             String targetActivity,
             int minFreq,
-            int maxFreq) throws ParseException {
+            int maxFreq,
+            int constraintId) throws ParseException {
         this.amount = peMap.size() - 1;
         this.current = 0;
 
@@ -76,14 +87,16 @@ public class ConstraintFCM implements Runnable{
                         key,
                         evtIdList,
                         targetActivity,
-                        "The number of "+targetActivity +" is "+actCount+" (exceeds the required frequency)");
+                        "The number of "+targetActivity +" is "+actCount+" (exceeds the required frequency)",
+                        constraintId);
             }
             else if (actCount<minFreq){
                 vs.appendViolatedRule(
                         key,
                         evtIdList,
                         targetActivity,
-                        "The number of "+targetActivity +" is "+actCount+" (below the required frequency)");
+                        "The number of "+targetActivity +" is "+actCount+" (below the required frequency)",
+                        constraintId);
             }
 
         }
@@ -99,7 +112,8 @@ public class ConstraintFCM implements Runnable{
                     peMap,
                     targetActivity,
                     minFreq,
-                    maxFreq);
+                    maxFreq,
+                    constraintId);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

@@ -1,10 +1,15 @@
 package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-
-import java.text.ParseException;
-import java.util.*;
 
 /*
  * @param null:
@@ -25,7 +30,8 @@ public class ConstraintPFCCM implements Runnable{
     public String sucAct;
     public int sucActCardMin;
     public int sucActCardMax;
-    public List objTypeLst;
+    public List<String> objTypeLst;
+    public int constraintId;
 
     public ConstraintPFCCM(){
     }
@@ -37,7 +43,8 @@ public class ConstraintPFCCM implements Runnable{
                            String sucAct,
                            int sucActCardMin,
                            int sucActCardMax,
-                           Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap){
+                           Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+                           int constraintId){
         this.preAct = preAct;
         this.preActCardMin = preActCardMin;
         this.preActCardMax = preActCardMax;
@@ -45,6 +52,7 @@ public class ConstraintPFCCM implements Runnable{
         this.sucActCardMin = sucActCardMin;
         this.sucActCardMax = sucActCardMax;
         this.peMap = peMap;
+        this.constraintId = constraintId;
     }
 
 
@@ -64,7 +72,8 @@ public class ConstraintPFCCM implements Runnable{
                 sucAct,
                 sucActCardMin,
                 sucActCardMax,
-                peMap);
+                peMap,
+                constraintId);
     }
 
     public ViolatedSet getCardinalityConstraint(
@@ -74,7 +83,8 @@ public class ConstraintPFCCM implements Runnable{
                                                 String sucAct,
                                                 int sucActCardMin,
                                                 int sucActCardMax,
-                                                Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap) throws ParseException {
+                                                Map<String, HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>>> peMap,
+                                                int constraintId) throws ParseException {
         this.current = 0;
         // iterate the process execution
         for (String peId: peMap.keySet()) {
@@ -104,7 +114,8 @@ public class ConstraintPFCCM implements Runnable{
                                 peId,
                                 evtLst,
                                 preAct+","+sucAct,
-                                "The number of succeeding activity " + sucAct + " does not match the cardinality constraint");
+                                "The number of succeeding activity " + sucAct + " does not match the cardinality constraint",
+                                constraintId);
                     }
                 }
                 else if (evt.activity.equals("sucAct")){
@@ -186,7 +197,8 @@ public class ConstraintPFCCM implements Runnable{
                     sucAct,
                     sucActCardMin,
                     sucActCardMax,
-                    peMap);
+                    peMap,
+                    constraintId);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

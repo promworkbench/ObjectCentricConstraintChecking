@@ -50,11 +50,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 
-import org.processmining.cachealignment.algorithms.swing.util.mxCellOverlay;
-import org.processmining.cachealignment.algorithms.swing.util.mxICellOverlay;
-import org.processmining.cachealignment.algorithms.swing.view.mxCellEditor;
-import org.processmining.cachealignment.algorithms.swing.view.mxICellEditor;
-import org.processmining.cachealignment.algorithms.swing.view.mxInteractiveCanvas;
 import org.processmining.cachealignment.algorithms.canvas.mxGraphics2DCanvas;
 import org.processmining.cachealignment.algorithms.canvas.mxICanvas;
 import org.processmining.cachealignment.algorithms.model.mxGraphModel;
@@ -69,6 +64,11 @@ import org.processmining.cachealignment.algorithms.swing.handler.mxGraphTransfer
 import org.processmining.cachealignment.algorithms.swing.handler.mxPanningHandler;
 import org.processmining.cachealignment.algorithms.swing.handler.mxSelectionCellsHandler;
 import org.processmining.cachealignment.algorithms.swing.handler.mxVertexHandler;
+import org.processmining.cachealignment.algorithms.swing.util.mxCellOverlay;
+import org.processmining.cachealignment.algorithms.swing.util.mxICellOverlay;
+import org.processmining.cachealignment.algorithms.swing.view.mxCellEditor;
+import org.processmining.cachealignment.algorithms.swing.view.mxICellEditor;
+import org.processmining.cachealignment.algorithms.swing.view.mxInteractiveCanvas;
 import org.processmining.cachealignment.algorithms.util.mxConstants;
 import org.processmining.cachealignment.algorithms.util.mxEvent;
 import org.processmining.cachealignment.algorithms.util.mxEventObject;
@@ -182,7 +182,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	/**
 	 * Specifies the default page scale. Default is 1.4
 	 */
-	public static final double DEFAULT_PAGESCALE = 10;
+	public static double DEFAULT_PAGESCALE = 10;
 
 	/**
 	 * Loads the collapse and expand icons.
@@ -276,7 +276,7 @@ public class mxGraphComponent extends JScrollPane implements Printable
 	 * Defines the scaling for the background page metrics. Default is
 	 * {@link #DEFAULT_PAGESCALE}.
 	 */
-	protected double pageScale = DEFAULT_PAGESCALE;
+	public double pageScale = DEFAULT_PAGESCALE;
 
 	/**
 	 * Specifies if the background page should be visible. Default is false.

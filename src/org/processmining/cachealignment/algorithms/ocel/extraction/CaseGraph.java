@@ -1,44 +1,103 @@
 package org.processmining.cachealignment.algorithms.ocel.extraction;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
 import org.processmining.cachealignment.algorithms.analysis.mxAnalysisGraph;
 import org.processmining.cachealignment.algorithms.analysis.mxGraphGenerator;
 import org.processmining.cachealignment.algorithms.analysis.mxGraphProperties;
+import org.processmining.cachealignment.algorithms.editor.EditorAboutFrame;
 import org.processmining.cachealignment.algorithms.editor.EditorKeyboardHandlerForOCCLEditor;
-import org.processmining.cachealignment.algorithms.layout.*;
+import org.processmining.cachealignment.algorithms.editor.EditorPopupMenu;
+import org.processmining.cachealignment.algorithms.io.mxCodec;
+import org.processmining.cachealignment.algorithms.layout.mxCircleLayout;
+import org.processmining.cachealignment.algorithms.layout.mxCompactTreeLayout;
+import org.processmining.cachealignment.algorithms.layout.mxEdgeLabelLayout;
+import org.processmining.cachealignment.algorithms.layout.mxFastOrganicLayout;
+import org.processmining.cachealignment.algorithms.layout.mxIGraphLayout;
+import org.processmining.cachealignment.algorithms.layout.mxOrganicLayout;
+import org.processmining.cachealignment.algorithms.layout.mxParallelEdgeLayout;
+import org.processmining.cachealignment.algorithms.layout.mxPartitionLayout;
+import org.processmining.cachealignment.algorithms.layout.mxStackLayout;
+import org.processmining.cachealignment.algorithms.layout.hierarchical.mxHierarchicalLayout;
 import org.processmining.cachealignment.algorithms.model.mxCell;
 import org.processmining.cachealignment.algorithms.model.mxGeometry;
 import org.processmining.cachealignment.algorithms.model.mxICell;
 import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
+import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintModel;
+import org.processmining.cachealignment.algorithms.ocel.occl.GraphEditor;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventComparator;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
 import org.processmining.cachealignment.algorithms.swing.mxGraphComponent;
 import org.processmining.cachealignment.algorithms.swing.mxGraphOutline;
-import org.processmining.cachealignment.algorithms.swing.util.mxMorphing;
-import org.processmining.cachealignment.algorithms.view.mxGraph;
-import org.processmining.cachealignment.algorithms.editor.EditorAboutFrame;
-import org.processmining.cachealignment.algorithms.editor.EditorPopupMenu;
-import org.processmining.cachealignment.algorithms.io.mxCodec;
-import org.processmining.cachealignment.algorithms.layout.hierarchical.mxHierarchicalLayout;
-import org.processmining.cachealignment.algorithms.layout.*;
 import org.processmining.cachealignment.algorithms.swing.handler.mxKeyboardHandlerForOCCLEditor;
 import org.processmining.cachealignment.algorithms.swing.handler.mxRubberband;
-import org.processmining.cachealignment.algorithms.util.*;
-import org.processmining.cachealignment.algorithms.util.*;
+import org.processmining.cachealignment.algorithms.swing.util.mxMorphing;
+import org.processmining.cachealignment.algorithms.util.mxEvent;
+import org.processmining.cachealignment.algorithms.util.mxEventObject;
+import org.processmining.cachealignment.algorithms.util.mxEventSource;
+import org.processmining.cachealignment.algorithms.util.mxPoint;
+import org.processmining.cachealignment.algorithms.util.mxRectangle;
+import org.processmining.cachealignment.algorithms.util.mxResources;
+import org.processmining.cachealignment.algorithms.util.mxUndoManager;
+import org.processmining.cachealignment.algorithms.util.mxUndoableEdit;
+import org.processmining.cachealignment.algorithms.util.mxUtils;
+import org.processmining.cachealignment.algorithms.view.mxGraph;
 import org.processmining.contexts.uitopia.UIPluginContext;
-import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintModel;
-import org.processmining.cachealignment.algorithms.ocel.occl.GraphEditor;
 import org.w3c.dom.Document;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.List;
-import java.util.*;
 
 public class CaseGraph extends JPanel
 {
@@ -636,17 +695,17 @@ public class CaseGraph extends JPanel
 	}
 
 	public static Map<String, Integer> sortMap(Map<String, Integer> map) {
-		//利用Map的entrySet方法，转化为list进行排序
+		//鍒╃敤Map鐨別ntrySet鏂规硶锛岃浆鍖栦负list杩涜鎺掑簭
 		List<Map.Entry<String, Integer>> entryList = new ArrayList<>(map.entrySet());
-		//利用Collections的sort方法对list排序
+		//鍒╃敤Collections鐨剆ort鏂规硶瀵筶ist鎺掑簭
 		Collections.sort(entryList, new Comparator<Map.Entry<String, Integer>>() {
 			@Override
 			public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-				//正序排列，倒序反过来
+				//姝ｅ簭鎺掑垪锛屽�掑簭鍙嶈繃鏉�
 				return o1.getValue() - o2.getValue();
 			}
 		});
-		//遍历排序好的list，一定要放进LinkedHashMap，因为只有LinkedHashMap是根据插入顺序进行存储
+		//閬嶅巻鎺掑簭濂界殑list锛屼竴瀹氳鏀捐繘LinkedHashMap锛屽洜涓哄彧鏈塋inkedHashMap鏄牴鎹彃鍏ラ『搴忚繘琛屽瓨鍌�
 		LinkedHashMap<String, Integer> linkedHashMap = new LinkedHashMap<String, Integer>();
 		for (Map.Entry<String,Integer> e : entryList
 		) {
@@ -893,7 +952,7 @@ public class CaseGraph extends JPanel
 		});
 
 		// Installs a mouse motion listener to display the mouse location
-		// æ²¡æœ‰å¿…è¦�å�§ï¼Ÿ
+		// 忙虏隆忙艙鈥懊ヂ库�γ︼拷氓锟铰寂�
 		graphComponent.getGraphControl().addMouseMotionListener(
 				new MouseMotionListener()
 				{
@@ -913,7 +972,7 @@ public class CaseGraph extends JPanel
 					 */
 					public void mouseMoved(MouseEvent e)
 					{
-						// å�¯èƒ½æ²¡æœ‰å¿…è¦�
+						// 氓锟铰ㄆ捖矫β猜∶ε撯�懊ヂ库�γ︼拷
 						graphComponent.getGraph().refresh();
 					}
 
@@ -1423,6 +1482,7 @@ public class CaseGraph extends JPanel
 		 * is not a valid drop target and the cells are of the same
 		 * type (eg. both vertices or both edges).
 		 */
+		@SuppressWarnings("finally")
 		public Object[] importCells(Object[] cells, double dx, double dy,
 									Object target, Point location)
 		{
@@ -1595,14 +1655,14 @@ public class CaseGraph extends JPanel
 
 				// insert conditions
 				if (!minAmount.equals("") &&maxAmount.equals("")){
-					valForRefAct = "â‰¥"+minAmount;
+					valForRefAct = "芒鈥奥�"+minAmount;
 				}
 				else if (minAmount.equals("") && !maxAmount.equals("")){
-					valForRefAct = "â‰¤"+ maxAmount;
+					valForRefAct = "芒鈥奥�"+ maxAmount;
 				}
 
 				else if (!minAmount.equals("") && !maxAmount.equals("")){
-					valForRefAct ="â‰¥"+minAmount+" and "+"â‰¤"+ maxAmount;
+					valForRefAct ="芒鈥奥�"+minAmount+" and "+"芒鈥奥�"+ maxAmount;
 				}
 				else {
 					valForRefAct = "";

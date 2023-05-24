@@ -3,17 +3,44 @@
  */
 package org.processmining.cachealignment.algorithms.swing.handler;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 
 import org.processmining.cachealignment.algorithms.model.mxCell;
 import org.processmining.cachealignment.algorithms.model.mxGeometry;
@@ -22,15 +49,15 @@ import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintMod
 import org.processmining.cachealignment.algorithms.ocel.constraint.ConstraintTPCM;
 import org.processmining.cachealignment.algorithms.swing.mxGraphComponent;
 import org.processmining.cachealignment.algorithms.swing.util.mxMouseAdapter;
-import org.processmining.cachealignment.algorithms.view.mxCellState;
-import org.processmining.cachealignment.algorithms.view.mxGraph;
-import org.processmining.cachealignment.algorithms.view.mxGraphView;
 import org.processmining.cachealignment.algorithms.util.mxConstants;
 import org.processmining.cachealignment.algorithms.util.mxEvent;
 import org.processmining.cachealignment.algorithms.util.mxEventObject;
 import org.processmining.cachealignment.algorithms.util.mxEventSource;
 import org.processmining.cachealignment.algorithms.util.mxPoint;
 import org.processmining.cachealignment.algorithms.util.mxRectangle;
+import org.processmining.cachealignment.algorithms.view.mxCellState;
+import org.processmining.cachealignment.algorithms.view.mxGraph;
+import org.processmining.cachealignment.algorithms.view.mxGraphView;
 
 /**
  * Connection handler creates new connections between cells. This control is used to display the connector
@@ -46,7 +73,9 @@ public class mxConnectionHandler extends mxMouseAdapter
 	private double startY;
 	private double targetX;
 	private double targetY;
-
+	
+	protected String timeType;
+	
 	private String actToActName;
 
 	private String refActForObjToObjCardinality;
@@ -54,9 +83,9 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 	private String startActPortType;
 	private String targetActPortType;
-	private HashMap objSelectedMap = new HashMap();
+//	private HashMap objSelectedMap = new HashMap();
 
-	private List objTypeSelectedLst = new ArrayList();
+	private List<String> objTypeSelectedLst = new ArrayList();
 
 	private String temporalCons;
 
@@ -67,9 +96,9 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 	protected static List<String> timeSymbol = Arrays.asList(
 			"",
-			"≥",
+			"鈮�",
 			">",
-			"≤",
+			"鈮�",
 			"<");
 
 
@@ -595,7 +624,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 
 	/**
-	 * 操作的开始
+	 * 鎿嶄綔鐨勫紑濮�
 	 */
 	public void start(MouseEvent e, mxCellState state)
 	{
@@ -610,7 +639,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 
 	/**
-	 * 主要的操作代码都写在这个函数里面的
+	 * 涓昏鐨勬搷浣滀唬鐮侀兘鍐欏湪杩欎釜鍑芥暟閲岄潰鐨�
 	 */
 	public void mouseReleased(MouseEvent e)
 	{
@@ -650,7 +679,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 						if (!marker.hasValidState() && isCreateTarget())
 						{
 							Object vertex = createTargetVertex(e, source.getCell());
-
 
 							dropTarget = graph.getDropTarget(
 									new Object[] { vertex }, e.getPoint(),
@@ -720,8 +748,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 										"strokeColor=#8B4513;strokeWidth=3");
 								System.out.println(startActPortType + targetActPortType);
 								String actName = cm.startEntityName;
-								String timeType = c1.getParent().getValue().toString();
-								getActivityTimePerformanceDialog(cell,graph, actName);
+								getActivityTimePerformanceDialog(cell, graph, actName);
 							}
 
 							else if (startActPortType.equals("perfTimePort")&&
@@ -729,8 +756,8 @@ public class mxConnectionHandler extends mxMouseAdapter
 								((mxCell) cell).setStyle("straight;startArrow=None;endArrow=None;" +
 										"strokeColor=#8B4513;strokeWidth=3");
 								String actName = c1.getParent().getValue().toString();
-								String timeType = cm.startEntityName;
-								getActivityTimePerformanceDialog(cell,graph, actName);
+								System.out.print("Time type: "+timeType);
+								getActivityTimePerformanceDialog(cell, graph, actName);
 							}
 							//-------------------------------------------------
 
@@ -783,7 +810,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 							}
 							//--------------------------------------------------------
 
-							//----activity to frquency constraint------------
+							//----activity to frequency constraint------------
 							else if (startActPortType.equals("perfFreqPort")&&
 									targetActPortType.equals("actPerfPort")){
 								((mxCell) cell).setStyle("straight;startArrow=None;endArrow=None;" +
@@ -925,7 +952,8 @@ public class mxConnectionHandler extends mxMouseAdapter
 		// Load the image file that you want to insert into the box
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(new File("D:\\prom\\OCCL\\bin\\com\\mxgraph\\examples\\swing\\images\\cardArrow.png"));
+			
+			image = ImageIO.read(new File(System.getProperty("user.dir")+"\\src\\org\\processmining\\cachealignment\\algorithms\\resources\\arrow.png"));
 			Image dimg = image.getScaledInstance(50, 100, Image.SCALE_SMOOTH);
 			ImageIcon icon = new ImageIcon(dimg);
 			label.setIcon(icon);
@@ -933,15 +961,6 @@ public class mxConnectionHandler extends mxMouseAdapter
 			System.out.println("Error loading image file: " + ex.getMessage());
 		}
 
-		// Create an ImageIcon object using the loaded image
-
-
-		// Create a JLabel object to hold the image
-
-//		vBox2.add(label);
-//		vBox2.add(bAB1);
-//		vBox2.add(bAB2);
-//		vBox2.add(bAB3);
 		Box hBoxForSecondLabel = Box.createHorizontalBox();
 		hBoxForSecondLabel.add(Box.createHorizontalStrut(30));
 		hBoxForSecondLabel.add(jbnForSecondAct);
@@ -1055,84 +1074,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		dialog.getContentPane().add(vBox);
 	}
 
-	public void getTimePerfDialog(Object cell,
-								 mxGraph graph,
-								 String refAct) {
-		System.out.println(refAct);
-		JDialog dialog = new JDialog();
-		dialog.setAlwaysOnTop(true);
-		dialog.setTitle("Time Performance Constraint");
-		dialog.setSize(new Dimension(300,100));
-		dialog.setVisible(true);
-		dialog.setLocationRelativeTo(null);  // set to the center of the screen
-		Box hBox = Box.createHorizontalBox();
-		Box vBox = Box.createVerticalBox();
-
-		JPanel constraintPanel = new JPanel(new GridLayout(8, 1, 10, 0));
-		List<String> names = Arrays.asList(
-				"Waiting time",
-				"Synchronization time",
-				"Lagging time",
-				"Response time",
-				"Throughput time",
-				"Clogging time",
-				"Pooling time");
-		JComboBox<String> jcb = new JComboBox<>();
-
-		for (String name : names) {
-			jcb.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					timePerformanceCons = name;
-				}
-			});
-			jcb.addItem(name);
-		}
-		constraintPanel.add(jcb);
-		jcb.setMaximumSize(new Dimension(150,30));
-		jcb.setMinimumSize(new Dimension(150,30));
-		jcb.setPreferredSize(new Dimension(150,30));
-		hBox.add(jcb);
-
-		// btn panel
-		JPanel btnPanel = new JPanel();
-		btnPanel.setMaximumSize(new Dimension(150,70));
-		btnPanel.setMinimumSize(new Dimension(150,70));
-		btnPanel.setPreferredSize(new Dimension(150,70));
-
-		// add a confirm button
-		JButton jbConfirm = new JButton("Confirm");
-		jbConfirm.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// set the constraint time
-				graph.getModel().beginUpdate();
-				graph.getModel().endUpdate();
-				dialog.dispose();
-			}
-		});
-
-		// add a cancel button
-		JButton jbCancel = new JButton("Cancel");
-		jbCancel.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// remove the edge
-				graph.getModel().beginUpdate();
-				graph.removeCells(new Object[]{cell});
-				graph.getModel().endUpdate();
-				dialog.dispose();
-			}
-		});
-		Box hBox1 = Box.createHorizontalBox();
-		hBox1.add(Box.createHorizontalStrut(10));
-		hBox1.add(jbConfirm);
-		hBox1.add(Box.createHorizontalStrut(10));
-		hBox1.add(jbCancel);
-		vBox.add(hBox);
-		vBox.add(hBox1);
-		dialog.getContentPane().add(vBox);
-	}
+	
 
 	public void getActToActTimeDialog(Object cell,
 									  mxGraph graph,
@@ -1140,43 +1082,43 @@ public class mxConnectionHandler extends mxMouseAdapter
 									  String secondAct) {
 		JDialog dialog = new JDialog();
 		dialog.setTitle("Activity-activity temporal setting");
-		dialog.setMinimumSize(new Dimension(650,350));
-		dialog.setMaximumSize(new Dimension(650,350));
-		dialog.setPreferredSize(new Dimension(650,350));
+		dialog.setMinimumSize(new Dimension(400,350));
+		dialog.setMaximumSize(new Dimension(400,350));
+		dialog.setPreferredSize(new Dimension(400,350));
 		dialog.setVisible(true);
 		dialog.setLocationRelativeTo(null);  // set to the center of the screen
 
 		Box vBox = Box.createVerticalBox();
-		vBox.setMinimumSize(new Dimension(650,320));
-		vBox.setMaximumSize(new Dimension(650,320));
-		vBox.setPreferredSize(new Dimension(650,320));
+		vBox.setMinimumSize(new Dimension(350,320));
+		vBox.setMaximumSize(new Dimension(350,320));
+		vBox.setPreferredSize(new Dimension(350,320));
 
 		Box hBox = Box.createHorizontalBox();
-		hBox.setMinimumSize(new Dimension(600,250));
-		hBox.setMaximumSize(new Dimension(600,250));
-		hBox.setPreferredSize(new Dimension(600,250));
+		hBox.setMinimumSize(new Dimension(350,250));
+		hBox.setMaximumSize(new Dimension(350,250));
+		hBox.setPreferredSize(new Dimension(350,250));
 
 		List<JCheckBox> jcbLst = new ArrayList<>();
 		// ---set object type---
-		JPanel revolvingObjTypePanel = new JPanel(new GridLayout(10, 1, 0, 10));
-		for (String objName : cm.allObjectTyps) {
-			JCheckBox jrb = new JCheckBox(objName);
-			jcbLst.add(jrb);
-			revolvingObjTypePanel.add(jrb);
-		}
-		revolvingObjTypePanel.setMaximumSize(new Dimension(250,220));
-		revolvingObjTypePanel.setMinimumSize(new Dimension(250,220));
-		revolvingObjTypePanel.setPreferredSize(new Dimension(250,220));
-		revolvingObjTypePanel.setBorder(BorderFactory.createTitledBorder(
-				"object type"));
-		JScrollPane revObjScrollPane = new JScrollPane(revolvingObjTypePanel);
-		revObjScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		hBox.add(revObjScrollPane);
-		JScrollPane jsp3 = new JScrollPane(revolvingObjTypePanel);
-		hBox.add(jsp3);
+//		JPanel revolvingObjTypePanel = new JPanel(new GridLayout(10, 1, 0, 10));
+//		for (String objName : cm.allObjectTyps) {
+//			JCheckBox jrb = new JCheckBox(objName);
+//			jcbLst.add(jrb);
+//			revolvingObjTypePanel.add(jrb);
+//		}
+//		revolvingObjTypePanel.setMaximumSize(new Dimension(250,220));
+//		revolvingObjTypePanel.setMinimumSize(new Dimension(250,220));
+//		revolvingObjTypePanel.setPreferredSize(new Dimension(250,220));
+//		revolvingObjTypePanel.setBorder(BorderFactory.createTitledBorder(
+//				"object type"));
+//		JScrollPane revObjScrollPane = new JScrollPane(revolvingObjTypePanel);
+//		revObjScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//		hBox.add(revObjScrollPane);
+//		JScrollPane jsp3 = new JScrollPane(revolvingObjTypePanel);
+//		hBox.add(jsp3);
 		//------------------------------------------------------
 
-		// set horizontal box for setting cardinality
+		// set horizontal box for setting temporal constraint
 		Box vBoxForCard = Box.createVerticalBox();
 		Box hBoxForCard1 = Box.createHorizontalBox();
 		Box hBoxForCard2 = Box.createHorizontalBox();
@@ -1188,7 +1130,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		jlbForSecondAct.setMinimumSize(new Dimension(150,20));
 		jlbForSecondAct.setMaximumSize(new Dimension(150,20));
 		jlbForSecondAct.setPreferredSize(new Dimension(150,20));
-		JComboBox comboBox1=new JComboBox();
+		JComboBox<String> comboBox1=new JComboBox<String>();
 		comboBox1.setMinimumSize(new Dimension(80,20));
 		comboBox1.setMaximumSize(new Dimension(80,20));
 		comboBox1.setPreferredSize(new Dimension(80,20));
@@ -1196,7 +1138,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		comboBox1.addItem("Last");
 		comboBox1.addItem("All");
 
-		JComboBox comboBox2=new JComboBox();
+		JComboBox<String> comboBox2=new JComboBox<String>();
 		comboBox2.setMinimumSize(new Dimension(80,20));
 		comboBox2.setMaximumSize(new Dimension(80,20));
 		comboBox2.setPreferredSize(new Dimension(80,20));
@@ -1208,12 +1150,20 @@ public class mxConnectionHandler extends mxMouseAdapter
 		picLabel.setMinimumSize(new Dimension(200,100));
 		picLabel.setPreferredSize(new Dimension(200,100));
 
-		ImageIcon myPicture = new ImageIcon("C:\\PromTest\\Packages\\OCCM\\src\\images\\arrowForCard.png");
-		Image img = myPicture.getImage();
-		Image imgScale = img.getScaledInstance(100,100, Image.SCALE_SMOOTH);
-		ImageIcon scaledIcon = new ImageIcon(imgScale);
-		picLabel.setIcon(scaledIcon);
-		picLabel.setVisible(true);
+		
+		// Load the image file that you want to insert into the box
+		BufferedImage image = null;
+		try {
+			
+			image = ImageIO.read(new File(System.getProperty("user.dir")+"\\src\\org\\processmining\\cachealignment\\algorithms\\resources\\singleArrow.png"));
+			Image dimg = image.getScaledInstance(50, 100, Image.SCALE_SMOOTH);
+			ImageIcon scaledIcon = new ImageIcon(dimg);
+			picLabel.setIcon(scaledIcon);
+			picLabel.setVisible(true);
+		} catch (Exception ex) {
+			System.out.println("Error loading image file: " + ex.getMessage());
+		}
+
 		hBoxForCard1.add(Box.createHorizontalStrut(5));
 		hBoxForCard1.add(comboBox1);
 		hBoxForCard1.add(Box.createHorizontalStrut(5));
@@ -1234,7 +1184,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		maxTimeJtf.setMaximumSize(new Dimension(50,20));
 		maxTimeJtf.setMinimumSize(new Dimension(50,20));
 		maxTimeJtf.setPreferredSize(new Dimension(50,20));
-		JComboBox jcb_time_symbol=new JComboBox();
+		JComboBox<String> jcb_time_symbol=new JComboBox<String>();
 		for(String timeUnit:timeUnit){
 			jcb_time_symbol.addItem(timeUnit);
 		}
@@ -1264,9 +1214,9 @@ public class mxConnectionHandler extends mxMouseAdapter
 		vBoxForCard.setMinimumSize(new Dimension(320,210));
 		vBoxForCard.setPreferredSize(new Dimension(320,210));
 		cardPanel.add(vBoxForCard);
-		cardPanel.setMaximumSize(new Dimension(350,220));
-		cardPanel.setMinimumSize(new Dimension(350,220));
-		cardPanel.setPreferredSize(new Dimension(350,220));
+		cardPanel.setMaximumSize(new Dimension(450,220));
+		cardPanel.setMinimumSize(new Dimension(450,220));
+		cardPanel.setPreferredSize(new Dimension(450,220));
 		cardPanel.setBorder(BorderFactory.createTitledBorder("temporal constraint"));
 		JScrollPane cardScrollPane = new JScrollPane(cardPanel);
 		cardScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -1642,11 +1592,15 @@ public class mxConnectionHandler extends mxMouseAdapter
 		List<JCheckBox> jcbLst = new ArrayList<>();
 		// ---set object type---
 		JPanel revolvingObjTypePanel = new JPanel(new GridLayout(10, 1, 0, 10));
-		for (String objName : cm.allObjectTyps) {
+		for (String objName : cm.revObjTypes) {
 			JCheckBox jrb = new JCheckBox(objName);
 			jcbLst.add(jrb);
 			revolvingObjTypePanel.add(jrb);
 		}
+		JCheckBox jrb = new JCheckBox(cm.leadObjType);
+		jcbLst.add(jrb);
+		revolvingObjTypePanel.add(jrb);
+		
 		revolvingObjTypePanel.setMaximumSize(new Dimension(200,400));
 		revolvingObjTypePanel.setMinimumSize(new Dimension(200,400));
 		revolvingObjTypePanel.setPreferredSize(new Dimension(200,400));
@@ -1763,11 +1717,12 @@ public class mxConnectionHandler extends mxMouseAdapter
 				for (JCheckBox cb : jcbLst) {
 					if (cb.isSelected()) {
 						objTypeSelectedLst.add(String.valueOf(cb.getText()));
+						
 						objFlag = true;
 					}
 				}
 				if (objFlag) {
-					String timeType = jcb.getSelectedItem().toString();
+					timeType = jcb.getSelectedItem().toString();
 					setActivityTimePerformanceConstraint((mxCell) cell, graph, timeType, actName, objTypeSelectedLst, minTime, maxTime, timeUnit);
 					long minTimeInSeconds = getMinTime(minTime, timeUnit);
 					long maxTimeInSeconds = getMaxTime(maxTime, timeUnit);
@@ -1899,7 +1854,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 		mxGeometry geo2 = new mxGeometry(0, 0, 0,0);
 		geo2.setOffset(new mxPoint(14, 0));
 		geo2.setRelative(true);
-		mxCell port2 = new mxCell("≤1 day", geo2,
+		mxCell port2 = new mxCell("鈮�1 day", geo2,
 				"shape=ellipse;perimeter=ellipsePerimeter");
 		port2.setVertex(true);
 		graph.addCell(port2, cell);
@@ -1925,7 +1880,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 	public void setActToActTimeConstraint(mxCell cell,
 										 mxGraph graph,
-										 List objTypeSelectedLst,
+										 List<String> objTypeSelectedLst,
 										 String minTime,
 										 String maxTime,
 										 String prePattern,
@@ -1969,7 +1924,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 
 	public void setActToActCardConstraint(mxCell cell,
 										  mxGraph graph,
-										  List objTypeSelectedLst,
+										  List<String> objTypeSelectedLst,
 										  String firstAct,
 										  int preActCardMin,
 										  int preActCardMax,
@@ -2675,7 +2630,7 @@ public class mxConnectionHandler extends mxMouseAdapter
 //					double xForRefAct = startX + (targetX - startX)/2 + (targetY - startY)/2;
 //					double yForRefAct = startY + (targetY - startY)/2 + (targetX - startX)/2;
 //
-//					// 添加一个ref act
+//					// 娣诲姞涓�涓猺ef act
 //					mxCell refActVertex = (mxCell) graph.insertVertex(graph.getDefaultParent(),
 //							"",
 //							"Activity:\n"+refActForObjToObjCardinality,
@@ -2731,5 +2686,84 @@ public class mxConnectionHandler extends mxMouseAdapter
 //		dialog.getContentPane().add(vBox);
 //	}
 
+	
+//	public void getTimePerfDialog(Object cell,
+//			 mxGraph graph,
+//			 String refAct) {
+//System.out.println(refAct);
+//JDialog dialog = new JDialog();
+//dialog.setAlwaysOnTop(true);
+//dialog.setTitle("Time Performance Constraint");
+//dialog.setSize(new Dimension(400,100));
+//dialog.setVisible(true);
+//dialog.setLocationRelativeTo(null);  // set to the center of the screen
+//Box hBox = Box.createHorizontalBox();
+//Box vBox = Box.createVerticalBox();
+//
+//JPanel constraintPanel = new JPanel(new GridLayout(8, 1, 10, 0));
+//List<String> names = Arrays.asList(
+//"Waiting time",
+//"Synchronization time",
+//"Lagging time",
+//"Response time",
+//"Throughput time",
+//"Clogging time",
+//"Pooling time");
+//JComboBox<String> jcb = new JComboBox<>();
+//
+//for (String name : names) {
+//jcb.addActionListener(new ActionListener() {
+//@Override
+//public void actionPerformed(ActionEvent e) {
+//timePerformanceCons = name;
+//}
+//});
+//jcb.addItem(name);
+//}
+//constraintPanel.add(jcb);
+//jcb.setMaximumSize(new Dimension(150,30));
+//jcb.setMinimumSize(new Dimension(150,30));
+//jcb.setPreferredSize(new Dimension(150,30));
+//hBox.add(jcb);
+//
+//// btn panel
+//JPanel btnPanel = new JPanel();
+//btnPanel.setMaximumSize(new Dimension(150,70));
+//btnPanel.setMinimumSize(new Dimension(150,70));
+//btnPanel.setPreferredSize(new Dimension(150,70));
+//
+//// add a confirm button
+//JButton jbConfirm = new JButton("Confirm");
+//jbConfirm.addActionListener(new ActionListener() {
+//@Override
+//public void actionPerformed(ActionEvent e) {
+//// set the constraint time
+//graph.getModel().beginUpdate();
+//graph.getModel().endUpdate();
+//dialog.dispose();
+//}
+//});
+//
+//// add a cancel button
+//JButton jbCancel = new JButton("Cancel");
+//jbCancel.addActionListener(new ActionListener() {
+//@Override
+//public void actionPerformed(ActionEvent e) {
+//// remove the edge
+//graph.getModel().beginUpdate();
+//graph.removeCells(new Object[]{cell});
+//graph.getModel().endUpdate();
+//dialog.dispose();
+//}
+//});
+//Box hBox1 = Box.createHorizontalBox();
+//hBox1.add(Box.createHorizontalStrut(10));
+//hBox1.add(jbConfirm);
+//hBox1.add(Box.createHorizontalStrut(10));
+//hBox1.add(jbCancel);
+//vBox.add(hBox);
+//vBox.add(hBox1);
+//dialog.getContentPane().add(vBox);
+//}
 
 }

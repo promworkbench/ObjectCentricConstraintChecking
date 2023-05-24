@@ -1,11 +1,11 @@
 package org.processmining.cachealignment.algorithms.ocel.constraint;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-
-import java.text.ParseException;
-import java.util.*;
 
 // class for object cardinality constraint model
 
@@ -15,6 +15,7 @@ public class ConstraintOCCM implements Runnable{
     private int amount;
     public int minCard;
     public int maxCard;
+    public int constraintId;
     int objCount = 0;
     public String refObjType;
     public String targetActivity;
@@ -29,12 +30,14 @@ public class ConstraintOCCM implements Runnable{
                           String targetActivity,
                           String refObjType,
                           int minCard,
-                          int maxCard){
+                          int maxCard,
+                          int constraintId){
         this.ocel = ocelEventLog;
         this.targetActivity = targetActivity;
         this.refObjType = refObjType;
         this.minCard = minCard;
         this.maxCard = maxCard;
+        this.constraintId = constraintId;
     }
 
 
@@ -51,14 +54,16 @@ public class ConstraintOCCM implements Runnable{
                 targetActivity,
                 refObjType,
                 minCard,
-                maxCard);
+                maxCard,
+                constraintId);
     }
 
     public ViolatedSet getObjCardConstraint(OcelEventLog ocel,
                                             String targetActivity,
                                             String refObjType,
                                             int minCard,
-                                            int maxCard) throws ParseException {
+                                            int maxCard,
+                                            int constraintId) throws ParseException {
         this.amount = ocel.events.size() - 1;
         this.current = 0;
 
@@ -78,7 +83,8 @@ public class ConstraintOCCM implements Runnable{
                             evtLst,
                             evt.activity,
                             "The number of objects of type "+
-                            refObjType+" related to "+targetActivity +" is: "+objCount);
+                            refObjType+" related to "+targetActivity +" is: "+objCount,
+                            constraintId);
                 }
             }
             objCount = 0;
@@ -96,7 +102,8 @@ public class ConstraintOCCM implements Runnable{
                     targetActivity,
                     refObjType,
                     minCard,
-                    maxCard);
+                    maxCard,
+                    constraintId);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

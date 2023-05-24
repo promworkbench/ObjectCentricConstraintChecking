@@ -3,7 +3,13 @@ package org.processmining.cachealignment.algorithms.ocel.constraint;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -91,11 +97,11 @@ public class ViolationTable{
         List<OcelEvent> evtlist = new ArrayList<>(ocel.events.values());
         evtlist.sort(new OcelEventComparator());
         String targetAct = activity;
-        Map<String, Set<OcelObject>> evtObjMap = new HashMap<>();
-        Map<Integer, String> idMap = new HashMap();
-        Map<String, Map> processExecutionIdMap = new HashMap();
-        Map<String, Map> processExecutionActMap = new HashMap();
-        Map<String, Map> processExecutionEdgeMap = new HashMap();
+        Map<String, Set<OcelObject>> evtObjMap = new HashMap<String, Set<OcelObject>>();
+        Map<Integer, String> idMap = new HashMap<Integer, String>();
+        Map<String, Map> processExecutionIdMap = new HashMap<String, Map>();
+        Map<String, Map> processExecutionActMap = new HashMap<String, Map>();
+        Map<String, Map> processExecutionEdgeMap = new HashMap<String, Map>();
         Map<String, ArrayList<ArrayList<Integer>>> currentEdgeMap;
 
         int peCount = 0;
@@ -175,13 +181,13 @@ public class ViolationTable{
                 }
             }
         }
-        Map<String, Map> map1 = new HashMap<>();
+        Map<String, Map<String, Map>> map1 = new HashMap<>();
         map1.put("processExeMap1",processExecutionIdMap);
-        Map<String, Map> map2 = new HashMap<>();
+        Map<String, Map<String, Map>> map2 = new HashMap<>();
         map2.put("processExeMap2",processExecutionActMap);
-        Map<String, Map> map3 = new HashMap<>();
+        Map<String, Map<String, Map>> map3 = new HashMap<>();
         map3.put("edgeMap",processExecutionEdgeMap);
-        Map<String, Map> map4 = new HashMap<>();
+        Map<String, Map<Integer, String>> map4 = new HashMap<>();
         map4.put("idMap",idMap);
 
         List<Map> lstMap = new ArrayList<>();

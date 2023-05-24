@@ -1,37 +1,91 @@
 package org.processmining.cachealignment.algorithms.ocel.extraction;
 
-import org.processmining.cachealignment.algorithms.editor.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+
+import org.processmining.cachealignment.algorithms.editor.ActEditorPalette;
+import org.processmining.cachealignment.algorithms.editor.EditorAboutFrame;
+import org.processmining.cachealignment.algorithms.editor.EditorKeyboardHandlerForOCCLEditor;
+import org.processmining.cachealignment.algorithms.editor.EditorPopupMenu;
+import org.processmining.cachealignment.algorithms.editor.PerformanceEditorPalette;
+import org.processmining.cachealignment.algorithms.editor.objEditorPalette;
 import org.processmining.cachealignment.algorithms.io.mxCodec;
+import org.processmining.cachealignment.algorithms.layout.mxCircleLayout;
+import org.processmining.cachealignment.algorithms.layout.mxCompactTreeLayout;
+import org.processmining.cachealignment.algorithms.layout.mxEdgeLabelLayout;
+import org.processmining.cachealignment.algorithms.layout.mxFastOrganicLayout;
+import org.processmining.cachealignment.algorithms.layout.mxIGraphLayout;
+import org.processmining.cachealignment.algorithms.layout.mxOrganicLayout;
+import org.processmining.cachealignment.algorithms.layout.mxParallelEdgeLayout;
+import org.processmining.cachealignment.algorithms.layout.mxPartitionLayout;
+import org.processmining.cachealignment.algorithms.layout.mxStackLayout;
 import org.processmining.cachealignment.algorithms.layout.hierarchical.mxHierarchicalLayout;
-import org.processmining.cachealignment.algorithms.layout.*;
 import org.processmining.cachealignment.algorithms.model.mxCell;
 import org.processmining.cachealignment.algorithms.model.mxGeometry;
-import org.processmining.cachealignment.algorithms.model.mxICell;
-import org.processmining.cachealignment.algorithms.model.mxIGraphModel;
 import org.processmining.cachealignment.algorithms.ocel.occl.GraphEditor;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEvent;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventComparator;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelEventLog;
 import org.processmining.cachealignment.algorithms.ocel.ocelobjects.OcelObject;
-import org.processmining.cachealignment.algorithms.swing.handler.mxKeyboardHandlerForOCCLEditor;
-import org.processmining.cachealignment.algorithms.swing.handler.mxRubberband;
 import org.processmining.cachealignment.algorithms.swing.mxGraphComponent;
 import org.processmining.cachealignment.algorithms.swing.mxGraphOutline;
+import org.processmining.cachealignment.algorithms.swing.handler.mxKeyboardHandlerForOCCLEditor;
+import org.processmining.cachealignment.algorithms.swing.handler.mxRubberband;
 import org.processmining.cachealignment.algorithms.swing.util.mxMorphing;
-import org.processmining.cachealignment.algorithms.util.*;
+import org.processmining.cachealignment.algorithms.util.mxEvent;
+import org.processmining.cachealignment.algorithms.util.mxEventObject;
+import org.processmining.cachealignment.algorithms.util.mxEventSource;
+import org.processmining.cachealignment.algorithms.util.mxRectangle;
+import org.processmining.cachealignment.algorithms.util.mxResources;
+import org.processmining.cachealignment.algorithms.util.mxUndoManager;
+import org.processmining.cachealignment.algorithms.util.mxUndoableEdit;
+import org.processmining.cachealignment.algorithms.util.mxUtils;
 import org.processmining.cachealignment.algorithms.view.mxGraph;
 import org.processmining.contexts.uitopia.UIPluginContext;
 import org.w3c.dom.Document;
-
-import javax.swing.Timer;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.List;
-import java.util.*;
 
 public class ProcessExecutionPanel extends JPanel
 {
@@ -47,7 +101,7 @@ public class ProcessExecutionPanel extends JPanel
 			"#FFF68F","#EEEE00","#FFC125","#8B6914","#CD5C5C","#EE6363","#7A8B8B",
 			"#D2691E","#FFE7BA","#CD2626","#9932CC","#FF34B3","#90EE90"));
 
-	Map<String, Map> objToColorMap = new HashMap<>();
+	Map<String, Map<String,String>> objToColorMap = new HashMap<>();
 
 	int colorIdx = 0;
 
@@ -212,7 +266,7 @@ public class ProcessExecutionPanel extends JPanel
 		undoManager.addListener(mxEvent.UNDO, undoHandler);
 		undoManager.addListener(mxEvent.REDO, undoHandler);
 
-		// Creates the graph outline component, å�¯ä»¥æ‹½æ�¥æ‹½åŽ»
+		// Creates the graph outline component, 氓锟铰ぢ宦ッ︹�孤矫︼拷楼忙鈥孤矫ヅ铰�
 		graphOutline = new mxGraphOutline(graphComponent);
 
 		// -------- pane for process execution
@@ -351,8 +405,12 @@ public class ProcessExecutionPanel extends JPanel
 								new mxGeometry((widthLayout - width)/2,
 										(heightLayout - height)/2,
 										widthLayout, heightLayout));
+						double widthScale = graphComponent.getLayoutAreaSize().getWidth() / graph.getGraphBounds().getWidth();
+						double heightScale = graphComponent.getLayoutAreaSize().getHeight() / graph.getGraphBounds().getHeight();
+
 
 						graph.getModel().endUpdate();
+						graphComponent.revalidate();
 					}
 				}
 				else if (e.getStateChange() == ItemEvent.DESELECTED) {
@@ -360,11 +418,7 @@ public class ProcessExecutionPanel extends JPanel
 
 					//remove the color colorIdx from the map
 					colorIdx = colorIdx - objToColorMap.get(jcb.getText()).size();
-
-					System.out.println("before deselect"+ objToColorMap.size());
 					objToColorMap.remove(jcb.getText());  //remove the selected object type
-					System.out.println("after deselect"+ objToColorMap.size());
-
 					if (selectedRow > -1){
 						graph.getModel().beginUpdate();
 						graph.selectAll();
@@ -490,7 +544,7 @@ public class ProcessExecutionPanel extends JPanel
 //						Collections.sort(mainList, new OcelEventComparator());
 //						Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
 //						HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
-//						Set<OcelEvent> allEvt = new HashSet<>();
+//						Set<OcelEvent> allEvt = new HashSet<>();   
 //						for (OcelEvent evt : mainList) {
 //							allEvt.add(evt);
 //							HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
@@ -691,107 +745,229 @@ public class ProcessExecutionPanel extends JPanel
 
 				// get selected row
 				selectedRow = jtl.getSelectedRow();
-				graph.getModel().beginUpdate();
-				graph.selectAll();
-				graph.removeCells();
-
-				Object parent = graph.getDefaultParent();
-				String leadingObj = (String) jtl.getModel().getValueAt(
-						selectedRow, 0);
-				// get all the node
-				Set<OcelEvent> evtLst =  peMap.get(leadingObj).keySet();
-
-				List<OcelEvent> mainList = new ArrayList<OcelEvent>();
-				mainList.addAll(evtLst);
-
-				Collections.sort(mainList, new OcelEventComparator());
-				Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
-
-				HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
-
-				Set<OcelEvent> allEvt = new HashSet<>();
-				for (OcelEvent evt : mainList) {
-					allEvt.add(evt);
-					HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
-					for(OcelEvent dfEvt: dfEvtMap.keySet()) {
-						allEvt.add(dfEvt);
-					}
+				
+				//remove the color colorIdx from the map
+				colorIdx = 0;			
+				
+				for (String eachKey:selectedObjSet){
+					objToColorMap.put(eachKey, new HashMap<>());
 				}
-				List<OcelEvent> allEvtList = new ArrayList<OcelEvent>();
-				allEvtList.addAll(allEvt);
+				
+				if (selectedRow > -1){
+					graph.getModel().beginUpdate();
+					graph.selectAll();
+					graph.removeCells();
+					Object parent = graph.getDefaultParent();
+					String leadingObj = (String) jtl.getModel().getValueAt(
+							selectedRow,
+							0);
 
-				Collections.sort(allEvtList, new OcelEventComparator());
-
-
-				Object[] vertices = new Object[allEvt.size()];
-//				ArrayList<Object[]> vertices = new ArrayList<>();
-
-				int i = 0;
-
-				Map<OcelEvent,Integer> evtToNodeMap = new HashMap<>();
-				// first get the node
-				for (OcelEvent evt : allEvtList) {
-					vertices[i] = graph.insertVertex(parent,
-							evt.id,
-							evt.activity+"\n"+evt.timestamp,
-							200, 0,
-							120,
-							50,
-							"ellipse;fontSize=12");
-					edgeIdxToEvtId.put(evt.id, i);
-					evtToNodeMap.put(evt, i);
-					i += 1;
-				}
-
-
-				// then get the edge, iterate every event
-				for(OcelEvent evt:mainList){
-
-					// get all direct follow events
-					HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
-
-					// add an edge them if there is a shared object
-					for(OcelEvent dfEvt: dfEvtMap.keySet()) {
-
-
-						HashSet<OcelObject> objSet = dfEvtMap.get(dfEvt);
-						// iterate every obj
-						for (OcelObject obj:objSet) {
-							if (pem.revObjTypes.contains(obj.objectType.name)||
-									obj.id.equals(leadingObj)){
-								graph.insertEdge(parent,
-										null,
-										obj.id,
-										vertices[evtToNodeMap.get(evt)],
-										vertices[evtToNodeMap.get(dfEvt)],
-										"startArrow=none;endArrow=classic;fontSize=8;strokeWidth=1");
-							}
-
+					// get all the node
+					Set<OcelEvent> evtLst =  peMap.get(leadingObj).keySet();
+					List<OcelEvent> mainList = new ArrayList<>();
+					mainList.addAll(evtLst);
+					Collections.sort(mainList, new OcelEventComparator());
+					Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
+					HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
+					Set<OcelEvent> allEvt = new HashSet<>();
+					for (OcelEvent evt : mainList) {
+						allEvt.add(evt);
+						HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
+						for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+							allEvt.add(dfEvt);
 						}
 					}
-				}
+					List<OcelEvent> allEvtList = new ArrayList<OcelEvent>();
+					allEvtList.addAll(allEvt);
+					Collections.sort(allEvtList, new OcelEventComparator());
+					Object[] vertices = new Object[allEvt.size()];
+					int i = 0;
 
-				// set layout of the process exe
-				mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
-				layout.setParallelEdgeSpacing(40);
-				layout.setIntraCellSpacing(150);
-				layout.setInterRankCellSpacing(80);
-				layout.setInterHierarchySpacing(120);
-				layout.execute(graph.getDefaultParent());
+					Map<OcelEvent,Integer> evtToNodeMap = new HashMap<>();
+					// first get the node
+					for (OcelEvent evt : allEvtList) {
+						vertices[i] = graph.insertVertex(parent,
+								evt.id,
+								evt.activity+"\n"+evt.timestamp,
+								200, 0,
+								120,
+								60,
+								"ellipse;fontSize=12"
+						);
+						edgeIdxToEvtId.put(evt.id, i);
+						evtToNodeMap.put(evt, i);
+						i += 1;
+					}
 
-				double width = graph.getGraphBounds().getWidth();
-				double height = graph.getGraphBounds().getHeight();
-				double widthLayout = graphComponent.getLayoutAreaSize().getWidth();
-				double heightLayout = graphComponent.getLayoutAreaSize().getHeight();
-				graph.getModel().setGeometry(graph.getDefaultParent(),
-						new mxGeometry((widthLayout - width)/2,
-								(heightLayout - height)/2,
-								widthLayout, heightLayout));
+					// then get the edge, iterate every event
+					for(OcelEvent evt:mainList){
 
-				System.out.println("set the layout of p3 "+ width
-						+ " "+ height +" "+widthLayout +" "+heightLayout);
+						// get all direct follow events
+						HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
 
-				graph.getModel().endUpdate();
+						// add an edge them if there is a shared object
+						for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+							HashSet<OcelObject> objSet = dfEvtMap.get(dfEvt);
+							// iterate every obj
+							for (OcelObject objInSet:objSet) {
+
+								// if obj is the selected type
+								if (pem.revObjTypes.contains(objInSet.objectType.name) ||
+										objInSet.id.equals(leadingObj)) {
+									if (!selectedObjSet.contains(objInSet.objectType.name)) {
+										graph.insertEdge(parent,
+												null,
+												objInSet.id,
+												vertices[evtToNodeMap.get(evt)],
+												vertices[evtToNodeMap.get(dfEvt)],
+												"startArrow=none;endArrow=classic;fontSize=8;strokeWidth=1");
+									} else {
+										String colToUse;
+										if (objToColorMap.get(objInSet.objectType.name).containsKey(objInSet.id)) {
+											colToUse = (String) objToColorMap.get(objInSet.objectType.name).get(objInSet.id);
+										}
+										else{
+											colToUse = colorLst.get(colorIdx);
+											objToColorMap.get(objInSet.objectType.name).put(objInSet.id, colToUse);
+
+											colorIdx = colorIdx+1;
+										}
+										graph.insertEdge(parent,
+												null,
+												objInSet.id,
+												vertices[evtToNodeMap.get(evt)],
+												vertices[evtToNodeMap.get(dfEvt)],
+												"startArrow=none;endArrow=classic;fontSize=12;strokeWidth=3;" +
+														"strokeColor="+colToUse+";fontColor="+colToUse);
+
+									}
+								}
+							}
+						}
+					}
+
+					// set layout of the process exe
+					mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+					layout.setParallelEdgeSpacing(120);
+					layout.setIntraCellSpacing(150);
+					layout.setInterRankCellSpacing(60);
+					layout.setInterHierarchySpacing(120);
+					layout.execute(graph.getDefaultParent());
+
+					double width = graph.getGraphBounds().getWidth();
+					double height = graph.getGraphBounds().getHeight();
+					double widthLayout = graphComponent.getLayoutAreaSize().getWidth();
+					double heightLayout = graphComponent.getLayoutAreaSize().getHeight();
+					graph.getModel().setGeometry(graph.getDefaultParent(),
+							new mxGeometry((widthLayout - width)/2,
+									(heightLayout - height)/2,
+									widthLayout, heightLayout));
+
+					graph.getModel().endUpdate();
+//				graph.getModel().beginUpdate();
+//				graph.selectAll();
+//				graph.removeCells();
+//
+//				Object parent = graph.getDefaultParent();
+//				String leadingObj = (String) jtl.getModel().getValueAt(
+//						selectedRow, 0);
+//				// get all the node
+//				Set<OcelEvent> evtLst =  peMap.get(leadingObj).keySet();
+//
+//				List<OcelEvent> mainList = new ArrayList<OcelEvent>();
+//				mainList.addAll(evtLst);
+//
+//				Collections.sort(mainList, new OcelEventComparator());
+//				Map<String, Integer> edgeIdxToEvtId = new HashMap<>();
+//
+//				HashMap<OcelEvent, HashMap<OcelEvent,HashSet<OcelObject>>> evtDfMap = peMap.get(leadingObj);
+//
+//				Set<OcelEvent> allEvt = new HashSet<>();
+//				for (OcelEvent evt : mainList) {
+//					allEvt.add(evt);
+//					HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
+//					for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+//						allEvt.add(dfEvt);
+//					}
+//				}
+//				List<OcelEvent> allEvtList = new ArrayList<OcelEvent>();
+//				allEvtList.addAll(allEvt);
+//
+//				Collections.sort(allEvtList, new OcelEventComparator());
+//
+//
+//				Object[] vertices = new Object[allEvt.size()];
+////				ArrayList<Object[]> vertices = new ArrayList<>();
+//
+//				int i = 0;
+//
+//				Map<OcelEvent,Integer> evtToNodeMap = new HashMap<>();
+//				// first get the node
+//				for (OcelEvent evt : allEvtList) {
+//					vertices[i] = graph.insertVertex(parent,
+//							evt.id,
+//							evt.activity+"\n"+evt.timestamp,
+//							200, 0,
+//							120,
+//							50,
+//							"ellipse;fontSize=12");
+//					edgeIdxToEvtId.put(evt.id, i);
+//					evtToNodeMap.put(evt, i);
+//					i += 1;
+//				}
+//
+//
+//				// then get the edge, iterate every event
+//				for(OcelEvent evt:mainList){
+//
+//					// get all direct follow events
+//					HashMap<OcelEvent,HashSet<OcelObject>> dfEvtMap = evtDfMap.get(evt);
+//
+//					// add an edge them if there is a shared object
+//					for(OcelEvent dfEvt: dfEvtMap.keySet()) {
+//
+//
+//						HashSet<OcelObject> objSet = dfEvtMap.get(dfEvt);
+//						// iterate every obj
+//						for (OcelObject obj:objSet) {
+//							if (pem.revObjTypes.contains(obj.objectType.name)||
+//									obj.id.equals(leadingObj)){
+//								graph.insertEdge(parent,
+//										null,
+//										obj.id,
+//										vertices[evtToNodeMap.get(evt)],
+//										vertices[evtToNodeMap.get(dfEvt)],
+//										"startArrow=none;endArrow=classic;fontSize=8;strokeWidth=1");
+//							}
+//
+//						}
+//					}
+//				}
+//
+//				// set layout of the process exe
+//				mxHierarchicalLayout layout = new mxHierarchicalLayout(graph);
+//				layout.setParallelEdgeSpacing(40);
+//				layout.setIntraCellSpacing(150);
+//				layout.setInterRankCellSpacing(80);
+//				layout.setInterHierarchySpacing(120);
+//				layout.execute(graph.getDefaultParent());
+//
+//				double width = graph.getGraphBounds().getWidth();
+//				double height = graph.getGraphBounds().getHeight();
+//				double widthLayout = graphComponent.getLayoutAreaSize().getWidth();
+//				double heightLayout = graphComponent.getLayoutAreaSize().getHeight();
+//				graph.getModel().setGeometry(graph.getDefaultParent(),
+//						new mxGeometry((widthLayout - width)/2,
+//								(heightLayout - height)/2,
+//								widthLayout, heightLayout));
+////
+////
+////				double widthScale = graphComponent.getLayoutAreaSize().getWidth()/graph.getGraphBounds().getWidth();
+////				double heightScale = graphComponent.getLayoutAreaSize().getHeight() /graph.getGraphBounds().getHeight();
+//////			    System.out.print("scale" + width +" "+ height +" "+graphComponent.getWidth()+" "+graphComponent.getHeight());
+//		
+//				graph.getModel().endUpdate();
+			}
 			}
 		});
 		return jtl;
@@ -1064,7 +1240,7 @@ public class ProcessExecutionPanel extends JPanel
 		});
 
 		// Installs a mouse motion listener to display the mouse location
-		// æ²¡æœ‰å¿…è¦�å�§ï¼Ÿ
+		// 忙虏隆忙艙鈥懊ヂ库�γ︼拷氓锟铰寂�
 		graphComponent.getGraphControl().addMouseMotionListener(
 				new MouseMotionListener()
 				{
@@ -1084,7 +1260,7 @@ public class ProcessExecutionPanel extends JPanel
 					 */
 					public void mouseMoved(MouseEvent e)
 					{
-						// å�¯èƒ½æ²¡æœ‰å¿…è¦�
+						// 氓锟铰ㄆ捖矫β猜∶ε撯�懊ヂ库�γ︼拷
 						graphComponent.getGraph().refresh();
 					}
 
