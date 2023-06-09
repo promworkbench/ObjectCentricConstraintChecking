@@ -8,11 +8,11 @@
 	<property name="dist" location="dist" />
 	<property name="release" location="latestrelease" />
 	<property name="version" value="${major_minor}.${env.BUILD_NUMBER}" />
-	<property name="project" value="CacheAlignment" />
+	<property name="project" value="ObjectCentricConstraintChecking" />
 
 	<property name="author" value="Tian Li" />
 	<property name="organization" value="RWTH Aachen" />
-	<property name="description" value="CacheAlignment" />
+	<property name="description" value="ObjectCentricConstraintChecking" />
 	<!-- See https://svn.win.tue.nl/trac/prom/browser/Packages/ProM-Contexts/Trunk/src/org/processmining/contexts/uitopia/packagemanager/PMPackageView.java for a list of known licenses. -->
 	<property name="license" value="GPL" />
 	<property name="logo" value="prom_subtitle_hat_300.png" />
